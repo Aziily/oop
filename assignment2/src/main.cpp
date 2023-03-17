@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 #define GAP "\t" // use what to split while printing
 using namespace std;
@@ -30,13 +31,19 @@ class oneRecord{
 public:
     int id; // the id
     string name; // the name
-    int score[3]; // the scores
+    map<string, int> score; // the scores
 
 private:
     /// @brief calculate one's average score
     /// @return the average score
     double calAverage() {
-        return (double(score[0])+double(score[1])+double(score[2])) / 3.0;
+        double all = 0.0;
+        int num = 0;
+        for (auto scoreItem:score) {
+            num ++;
+            all += double(scoreItem.second);
+        }
+        return all / num;
     }
     /// @brief judge whether a score is an int
     /// @param score the score
@@ -50,11 +57,11 @@ public:
     /// @brief basic init function for onerecord
     /// @param initId the id
     /// @param initName the name
-    /// @param initScore the scores of one person
-    oneRecord(int initId, string initName, int initScore[3]){
+    /// @param initScore the scores map of one person
+    oneRecord(int initId, string initName, map<string, int> initScore){
         id = initId;
         name = initName;
-        for (int i = 0; i < 3; i ++) score[i] = initScore[i];
+        for (auto scoreItem:initScore) score[scoreItem.first] = scoreItem.second;
     }
     /// @brief use concated string to initialize onerecord
     /// @param initId the id
@@ -62,24 +69,38 @@ public:
     oneRecord(int initId, string all) {
         id = initId;
         auto parts = split(all, '/'); // split by '/'
-        if (parts.size() != 4) {
-            cout << "error record!" << endl;
+        if (parts.size() < 1) {
+            cout << "Error Record" << endl;
             return;
-        }else {
-            name = parts[0];
-            for (int i = 0; i < 3; i ++) {
-                stringstream ss(parts[i + 1]);
-                ss >> score[i];
+        }
+        name = parts[0];
+        if (parts.size() >= 2) {
+            for (int i = 1; i < parts.size(); i ++) {
+                auto scoreMap = split(parts[i], ':');
+                if (scoreMap.size() < 2) {
+                    cout << "Error Record" << endl;
+                    return;
+                }
+                stringstream ss(scoreMap[1]);
+                int scoreNum; ss >> scoreNum;
+                score[scoreMap[0]] = scoreNum;
             }
         }
     }
 
     /// @brief output one record in format
-    void output() {
-        cout << id << GAP << name << GAP \
-        << score[0] << GAP << score[1] << GAP << score[2] << GAP \
-        << fixed << (isInt(calAverage()) ? setprecision(0) : setprecision(6))\
-        << calAverage() << endl;
+    /// @param scoreIds ids to be print
+    void output(vector<string> scoreIds) {
+        cout << id << GAP << name << GAP;
+        for (auto scoreId:scoreIds) {
+            if (score.count(scoreId)) {
+                cout << score[scoreId] << GAP;
+            } else {
+                cout << GAP;
+            }
+        }
+        cout << fixed << (isInt(calAverage()) ? setprecision(0) : setprecision(6))\
+        << calAverage() << GAP << endl;
     }
 };
 
@@ -87,6 +108,7 @@ public:
 class dataBase{
 private:
     map<int, oneRecord> records; // records of a database
+    vector<string> scoreIds;
 
 private:
     /// @brief a function help output scores
@@ -95,8 +117,11 @@ private:
     /// @param scores the scores to output
     template <typename T>
     void outputScores(string prompt, vector<T> scores) {
-        cout << prompt << GAP << fixed << setprecision(1)\
-        << scores[0] << GAP << scores[1] << GAP << scores[2] << endl;
+        cout << prompt << GAP;
+        for (auto item : scores) {
+            cout << fixed << setprecision(1) << item << GAP;
+        }
+        cout << endl;
     }
 
 public:
@@ -108,59 +133,70 @@ public:
         int no = 1;
         while(getline(input, row)) { //split by rows
             // add one record
-            oneRecord test = oneRecord(no, row);
-            records.insert(pair<int, oneRecord>(no, test));
+            oneRecord record = oneRecord(no, row);
+            for (auto scoreItem:record.score) {
+                scoreIds.push_back(scoreItem.first);
+            }
+            records.insert(pair<int, oneRecord>(no, record));
             no ++;
         }
+        set<string> tempSet(scoreIds.begin(), scoreIds.end());
+        scoreIds.assign(tempSet.begin(), tempSet.end());
     }
 
     /// @brief calculate average scores of a database
     /// @return scores 
     vector<double> calAverageScores() {
-        vector<double> res(3);
-        res[0] = res[1] = res[2] = 0.0;
-        int len = records.size();
-        for (auto item : records) {
-            res[0] += item.second.score[0];
-            res[1] += item.second.score[1];
-            res[2] += item.second.score[2];
+        vector<double> res(scoreIds.size(), 0.0);
+        vector<int> num(scoreIds.size(), 0);
+        for (auto record : records) {
+            for (int i = 0; i < scoreIds.size(); i ++) {
+                if (record.second.score.count(scoreIds[i])) {
+                    res[i] += record.second.score[scoreIds[i]];
+                    num[i] ++;
+                }
+            }
         }
-        res[0] /= len;
-        res[1] /= len;
-        res[2] /= len;
+        for (int i = 0; i < res.size(); i ++) {
+            res[i] /= num[i];
+        }
         return res;
     }
     /// @brief calculate highest scores of a database
     /// @return scores 
     vector<int> getMaxScores() {
-        vector<int> res(3);
-        res[0] = res[1] = res[2] = 1;
-        for (auto item : records) {
-            res[0] = max(item.second.score[0], res[0]);
-            res[1] = max(item.second.score[1], res[1]);
-            res[2] = max(item.second.score[2], res[2]);
+        vector<int> res(scoreIds.size(), 0);
+        for (auto record : records) {
+            for (int i = 0; i < scoreIds.size(); i ++) {
+                if (record.second.score.count(scoreIds[i])) {
+                    res[i] = max(res[i], record.second.score[scoreIds[i]]);
+                }
+            }
         }
         return res;
     }
     /// @brief calculate lowest scores of a database
     /// @return scores 
     vector<int> getMinScores() {
-        vector<int> res(3);
-        res[0] = res[1] = res[2] = 5;
-        for (auto item : records) {
-            res[0] = min(item.second.score[0], res[0]);
-            res[1] = min(item.second.score[1], res[1]);
-            res[2] = min(item.second.score[2], res[2]);
+        vector<int> res(scoreIds.size(), 5);
+        for (auto record : records) {
+            for (int i = 0; i < scoreIds.size(); i ++) {
+                if (record.second.score.count(scoreIds[i])) {
+                    res[i] = min(res[i], record.second.score[scoreIds[i]]);
+                }
+            }
         }
         return res;
     }
     /// @brief output all records of the database in format
     void outputAllRecords() {
-        cout << "no" << GAP << "name" << GAP \
-        << "score1" << GAP << "score2" << GAP << "score3" << GAP \
-        << "average" << endl;
-        for (auto item : records) {
-            item.second.output();
+        cout << "no" << GAP << "name" << GAP ;
+        for (auto scoreId:scoreIds) {
+            cout << scoreId << GAP;
+        }
+        cout << "average" << GAP << endl;
+        for (auto record : records) {
+            record.second.output(scoreIds);
         }
     }
     /// @brief the function outputs all records in format and the average/max/min scores
@@ -181,7 +217,7 @@ public:
 /// @return errcode, 0 if success
 int main(int argc, char *argv[]) {
     // modify the path of records
-    string path = "../data/records.txt";
+    string path = "../data/basic_records.txt";
     if (argc == 2) path = argv[1];
 
     // initialize one database

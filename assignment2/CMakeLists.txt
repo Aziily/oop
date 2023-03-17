@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(Assignment1) # project name
+project(Assignment2) # project name
 
 aux_source_directory(./src SRCS) # src dir
 
