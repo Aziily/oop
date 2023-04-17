@@ -1,4 +1,7 @@
 #include "vector.hpp"
+template class Vector<int> ;
+template class Vector<double> ;
+template class Vector<string> ;
 
 template <class T>
 inline Vector<T>::Vector() {
@@ -9,7 +12,7 @@ inline Vector<T>::Vector() {
 
 template <class T>
 inline Vector<T>::Vector(int size) {
-    m_nSize = size;
+    m_nSize = 0;
     m_nCapacity = size;
     m_pElements = new T[size];
 }
@@ -64,7 +67,8 @@ inline T& Vector<T>::pop_back() {
     if (m_nSize == 0) {
         throw out_of_range("Vector is empty");
     }
-    return m_pElements[m_nSize--];
+    m_nSize--;
+    return m_pElements[m_nSize];
 }
 
 template <class T>

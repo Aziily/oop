@@ -11,5 +11,3 @@
 ## Quick Start
 
 `run.bat` or `run.sh` and see the test result in the terminal
-
-> `run.sh` is tested, while `run.bat` is not

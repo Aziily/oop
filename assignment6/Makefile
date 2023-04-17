@@ -10,10 +10,10 @@ TARGET = main
 BIN_TARGET = $(DIR_BIN)/$(TARGET)
 
 CC = g++
-CFLAGS = -std=c++11 -O3 -lstdc++
+CFLAGS = -std=c++11 -O3
 
-$(BIN_TARGET): $(OBJ)
-	$(CC) $(CFLAGS) $^ -o $@
+$(TARGET): $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $(BIN_TARGET)
 
 $(DIR_OBJ)/%.o: $(DIR_TEMP)/%.cpp
 	$(CC) $(CFLAGS) -c $^ -o $@

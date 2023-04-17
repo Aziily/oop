@@ -1,11 +1,13 @@
 mkdir temp
 mkdir bin
+mkdir obj
 
-copy src/*.cpp temp
-copy src/*.hpp temp
+copy src temp
 
-make fraction
+make main
 
-bin/main.exe
+bin\main.exe
 
-make clean
+del temp\*.cpp
+del temp\*.hpp
+del obj\*.o

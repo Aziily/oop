@@ -5,6 +5,8 @@ mkdir obj
 cp src/*.cpp temp
 cp src/*.hpp temp
 
-make bin/main
+make main
 
 bin/main
+
+make clean

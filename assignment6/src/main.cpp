@@ -1,5 +1,9 @@
 #include "vector.hpp"
 
+string bool2str(bool b) {
+    return b ? "true" : "false";
+}
+
 void test() {
     // test constructor and destructor
     cout << "test constructor" << endl;
@@ -76,10 +80,10 @@ void test() {
     cout << "test empty() and clear()" << endl;
     cout << "before clear:" << endl;
     v1.print();
-    cout << v1.empty() << endl;
+    cout << bool2str(v1.empty()) << endl;
     cout << "after clear:" << endl;
     v1.clear();
-    cout << v1.empty() << endl;
+    cout << bool2str(v1.empty()) << endl;
     v1.print();
     cout << endl;
 }

@@ -3,5 +3,6 @@
 build/
 temp/
 bin/
+obj/
 *.exe
 *.zip
