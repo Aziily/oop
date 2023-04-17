@@ -10,4 +10,4 @@
 
 ## Quick Start
 
-`run.bat` or `run.sh` and see the test result in the terminal
+Use  `run.bat` or `run.sh` and see the test result in the terminal
