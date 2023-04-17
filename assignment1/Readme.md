@@ -1,4 +1,4 @@
-# Assignment 1
+# Student I
 
 ## Meaning of dir and file
 
@@ -14,7 +14,6 @@
   the file for cmake
 * go.bat
   the script for windows users
-
 
 ## How to use
 

@@ -1,4 +1,4 @@
-# Assignment 2
+# Student II
 
 ## Meaning of dir and file
 
@@ -32,8 +32,6 @@ one example is
 > K.Weng/a:5/b:5/c:5
 
 Because I think the assignment is similar to a database, so I am in favour of using txt file as input, so I only offer such function and you cannot insert by using shell or something. Maybe latter I will add it.
-
-
 
 > P.S.
 >
