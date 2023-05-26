@@ -6,7 +6,7 @@ cp src/*.cpp temp
 cp src/*.hpp temp
 
 cd temp
-g++ -std=c++11 -Wall -Wextra -pedantic -O3 -o ../bin/program main.cpp
+g++ -std=c2x -Wall -Wextra -pedantic -O3 -o ../bin/program main.cpp
 cd ..
 rm -rf temp
 
