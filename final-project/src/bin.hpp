@@ -52,158 +52,209 @@ namespace Bin {
     }
 
     template <typename T>
-    shared_ptr<char *> serializeToChar(T serialize_data) {
-        shared_ptr<char *> ret = make_shared<char *>(new char[getSize(serialize_data)]);
-        memcpy(ret, &serialize_data, getSize(serialize_data));
-        return ret;
-    }
-    template <typename T>
-    shared_ptr<char *> serializeToChar(list<T> serialize_data) {
-        shared_ptr<char *> ret = make_shared<char *>(new char[getSize(serialize_data)]);
-        int record = 0;
-        for (auto it = serialize_data.begin(); it != serialize_data.end(); ++it) {
-            shared_ptr<char *> tmp = serializeToChar(*it);
-            memcpy(ret + record * getSize(*it), tmp.get(), getSize(*it));
-            record++;
-        }
-        return ret;
-    }
-    template <typename T>
-    shared_ptr<char *> serializeToChar(set<T> serialize_data) {
-        shared_ptr<char *> ret = make_shared<char *>(new char[getSize(serialize_data)]);
-        int record = 0;
-        for (auto it = serialize_data.begin(); it != serialize_data.end(); ++it) {
-            shared_ptr<char *> tmp = serializeToChar(*it);
-            memcpy(ret + record * getSize(*it), tmp.get(), getSize(*it));
-            record++;
-        }
-        return ret;
-    }
-    template <typename T>
-    shared_ptr<char *> serializeToChar(vector<T> serialize_data) {
-        shared_ptr<char *> ret = make_shared<char *>(new char[getSize(serialize_data)]);
-        int record = 0;
-        for (auto it = serialize_data.begin(); it != serialize_data.end(); ++it) {
-            shared_ptr<char *> tmp = serializeToChar(*it);
-            memcpy(ret + record * getSize(*it), tmp.get(), getSize(*it));
-            record++;
-        }
-        return ret;
-    }
-    template <typename T1, typename T2>
-    shared_ptr<char *> serializeToChar(map<T1, T2> serialize_data) {
-        shared_ptr<char *> ret = make_shared<char *>(new char[getSize(serialize_data)]);
-        int record = 0;
-        cout << "size: " << getSize(serialize_data) << endl;
-        for (auto it = serialize_data.begin(); it != serialize_data.end(); ++it) {
-            cout << "first: " << it->first << " second: " << it->second << endl;
-            cout << "size: " << getSize(it->first) << " " << getSize(it->second) << endl;
-            shared_ptr<char *> tmp1 = serializeToChar(it->first);
-            shared_ptr<char *> tmp2 = serializeToChar(it->second);
-            memcpy(ret + record * (getSize(it->first) + getSize(it->second)), tmp1.get(), getSize(it->first));
-            cout << ret << endl;
-            memcpy(ret + record * (getSize(it->first) + getSize(it->second)) + getSize(it->first), tmp2.get(), getSize(it->second));
-            cout << ret << endl;
-            record++;
-        }
-        return ret;
-    }
-    template <typename T1, typename T2>
-    shared_ptr<char *> serializeToChar(pair<T1, T2> serialize_data) {
-        shared_ptr<char *> ret = make_shared<char *>(new char[getSize(serialize_data)]);
-        shared_ptr<char *> tmp1 = serializeToChar(serialize_data.first);
-        shared_ptr<char *> tmp2 = serializeToChar(serialize_data.second);
-        memcpy(ret, tmp1.get(), getSize(serialize_data.first));
-        memcpy(ret + getSize(serialize_data.first), tmp2.get(), getSize(serialize_data.second));
-        return ret;
-    }
-    
-
-
-    template <typename T>
-    void deserializeFromChar(T& deserialize_data, shared_ptr<char *> data) {
-        memcpy(&deserialize_data, data.get(), sizeof(strlen(data.get())));
-    }
-    template <typename T>
-    void deserializeFromChar(list<T>& deserialize_data, shared_ptr<char *> data) {
-        int len = strlen(data.get()) / sizeof(T);
-        for (int i = 0; i < len; ++i) {
-            T tmp;
-            memcpy(&tmp, data.get() + i * sizeof(T), sizeof(T));
-            deserialize_data.push_back(tmp);
-        }
-    }
-    template <typename T>
-    void deserializeFromChar(set<T>& deserialize_data, shared_ptr<char *> data) {
-        int len = strlen(data.get()) / sizeof(T);
-        for (int i = 0; i < len; ++i) {
-            T tmp;
-            memcpy(&tmp, data.get() + i * sizeof(T), sizeof(T));
-            deserialize_data.insert(tmp);
-        }
-    }
-    template <typename T>
-    void deserializeFromChar(vector<T>& deserialize_data, shared_ptr<char *> data) {
-        int len = strlen(data.get()) / sizeof(T);
-        for (int i = 0; i < len; ++i) {
-            T tmp;
-            memcpy(&tmp, data.get() + i * sizeof(T), sizeof(T));
-            deserialize_data.push_back(tmp);
-        }
-    }
-    template <typename T1, typename T2>
-    void deserializeFromChar(map<T1, T2>& deserialize_data, shared_ptr<char *> data) {
-        int len = strlen(data.get()) / (sizeof(T1) + sizeof(T2));
-        for (int i = 0; i < len; ++i) {
-            T1 tmp1;
-            T2 tmp2;
-            memcpy(&tmp1, data.get() + i * (sizeof(T1) + sizeof(T2)), sizeof(T1));
-            memcpy(&tmp2, data.get() + i * (sizeof(T1) + sizeof(T2)) + sizeof(T1), sizeof(T2));
-            deserialize_data[tmp1] = tmp2;
-        }
-    }
-    template <typename T1, typename T2>
-    void deserializeFromChar(pair<T1, T2>& deserialize_data, shared_ptr<char *> data) {
-        T1 tmp1;
-        T2 tmp2;
-        memcpy(&tmp1, data.get(), sizeof(T1));
-        memcpy(&tmp2, data.get() + sizeof(T1), sizeof(T2));
-        deserialize_data = make_pair(tmp1, tmp2);
-    }
-
-
-
-
-    template <typename T>
-    bool SerializeBin(T serialize_data, const string& filename) {
-        shared_ptr<char *> origin = serializeToChar(serialize_data);
-        // cout << origin.get() << endl;
-        shared_ptr<char *> encoded = utils::base64::encode(origin.get());
-        ofstream ofs(filename, ios::binary);
-        if (!ofs) {
+    bool writeSerialize(const T data, ofstream& outputFile) {
+        cout << "data size: " << getSize(data) << endl;
+        if (outputFile) {
+            int size = getSize(data);
+            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            outputFile.write(reinterpret_cast<const char*>(&data), size);
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
             return false;
         }
-        ofs.write(encoded.get(), strlen(encoded.get()));
-        ofs.close();
-        return true;
+    }
+    template <typename T>
+    bool writeSerialize(list<T> data, ofstream& outputFile) {
+        cout << "list size: " << data.size() << endl;
+        if (outputFile) {
+            int size = data.size();
+            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            for (auto &it : data) {
+                writeSerialize(it, outputFile);
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T>
+    bool writeSerialize(set<T> data, ofstream& outputFile) {
+        cout << "set size: " << data.size() << endl;
+        if (outputFile) {
+            int size = data.size();
+            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            for (auto &it : data) {
+                writeSerialize(it, outputFile);
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T>
+    bool writeSerialize(vector<T> data, ofstream& outputFile) {
+        cout << "vector size: " << data.size() << endl;
+        if (outputFile) {
+            int size = data.size();
+            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            for (auto &it : data) {
+                writeSerialize(it, outputFile);
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T1, typename T2>
+    bool writeSerialize(map<T1, T2> data, ofstream& outputFile) {
+        cout << "map size: " << data.size() << endl;
+        if (outputFile) {
+            int size = data.size();
+            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            for (auto &it : data) {
+                writeSerialize(it.first, outputFile);
+                writeSerialize(it.second, outputFile);
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T1, typename T2>
+    bool writeSerialize(pair<T1, T2> data, ofstream& outputFile) {
+        cout << "pair size: " << getSize(data) << endl;
+        if (outputFile) {
+            writeSerialize(data.first, outputFile);
+            writeSerialize(data.second, outputFile);
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
     }
 
     template <typename T>
-    bool DeserializeBin(T& deserialize_data, const string& filename) {
-        ifstream ifs(filename, ios::binary);
-        if (!ifs) {
+    bool readSerialize(T& data, ifstream& inputFile) {
+        if (inputFile) {
+            int size;
+            inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+            inputFile.read(reinterpret_cast<char*>(&data), size);
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
             return false;
         }
-        ifs.seekg(0, ios::end);
-        int len = ifs.tellg();
-        ifs.seekg(0, ios::beg);
-        shared_ptr<char *> encoded(new char[len + 1]);
-        ifs.read(encoded.get(), len);
-        encoded.get()[len] = '\0';
-        shared_ptr<char *> decoded = utils::base64::decode(encoded.get());
-        deserializeFromChar(deserialize_data, decoded);
-        ifs.close();
-        return true;
+    }
+    template <typename T>
+    bool readSerialize(list<T>& data, ifstream& inputFile) {
+        if (inputFile) {
+            int size;
+            inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+            cout << "list size: " << size << endl;
+            for (int i = 0; i < size; ++i) {
+                T tmp;
+                readSerialize(tmp, inputFile);
+                data.push_back(tmp);
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T>
+    bool readSerialize(set<T>& data, ifstream& inputFile) {
+        if (inputFile) {
+            int size;
+            inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+            cout << "set size: " << size << endl;
+            for (int i = 0; i < size; ++i) {
+                T tmp;
+                readSerialize(tmp, inputFile);
+                data.insert(tmp);
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T>
+    bool readSerialize(vector<T>& data, ifstream& inputFile) {
+        if (inputFile) {
+            int size;
+            inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+            cout << "vector size: " << size << endl;
+            for (int i = 0; i < size; ++i) {
+                T tmp;
+                readSerialize(tmp, inputFile);
+                data.push_back(tmp);
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T1, typename T2>
+    bool readSerialize(map<T1, T2>& data, ifstream& inputFile) {
+        if (inputFile) {
+            int size;
+            inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+            cout << "map size: " << size << endl;
+            for (int i = 0; i < size; ++i) {
+                T1 tmp1;
+                T2 tmp2;
+                readSerialize(tmp1, inputFile);
+                readSerialize(tmp2, inputFile);
+                data.insert(make_pair(tmp1, tmp2));
+            }
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    template <typename T1, typename T2>
+    bool readSerialize(pair<T1, T2>& data, ifstream& inputFile) {
+        if (inputFile) {
+            cout << "pair size: " << getSize(data) << endl;
+            readSerialize(data.first, inputFile);
+            readSerialize(data.second, inputFile);
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+
+    template <typename T>
+    bool Serialize(const T data, const string filename) {
+        ofstream outputFile(filename, ios::binary);
+        if (outputFile) {
+            bool ok = writeSerialize(data, outputFile);
+            return ok;
+        } else {
+            cerr << "无法打开文件：" << filename << endl;
+            return false;
+        }
+    }
+
+    template <typename T>
+    bool Deserialize(T& data, const string filename) {
+        ifstream inputFile(filename, ios::binary);
+        if (inputFile) {
+            bool ok = readSerialize(data, inputFile);
+            return ok;
+        } else {
+            cerr << "无法打开文件：" << filename << endl;
+            return false;
+        }
     }
 };
 
