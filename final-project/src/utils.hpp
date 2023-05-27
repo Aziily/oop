@@ -25,33 +25,33 @@ namespace utils {
         static const int STRING_TYPE = 6;
 
         template<typename T>
-        struct is_list : std::false_type {};
+        struct is_list : false_type {};
         template<typename... Args>
-        struct is_list<std::list<Args...>> : std::true_type {};
+        struct is_list<list<Args...>> : true_type {};
 
         template<typename T>
-        struct is_set : std::false_type {};
+        struct is_set : false_type {};
         template<typename... Args>
-        struct is_set<std::set<Args...>> : std::true_type {};
+        struct is_set<set<Args...>> : true_type {};
 
         template<typename T>
-        struct is_vector : std::false_type {};
+        struct is_vector : false_type {};
         template<typename... Args>
-        struct is_vector<std::vector<Args...>> : std::true_type {};
+        struct is_vector<vector<Args...>> : true_type {};
 
         template<typename T>
-        struct is_map : std::false_type {};
+        struct is_map : false_type {};
         template<typename Key, typename Value>
-        struct is_map<std::map<Key, Value>> : std::true_type {};
+        struct is_map<map<Key, Value>> : true_type {};
 
         template<typename T>
-        struct is_pair : std::false_type {};
+        struct is_pair : false_type {};
         template<typename First, typename Second>
-        struct is_pair<std::pair<First, Second>> : std::true_type {};
+        struct is_pair<pair<First, Second>> : true_type {};
         
 
         template<typename T>
-        int CheckType() {
+        int CheckType(T data) {
             if (is_list<T>::value) {
                 return LIST_TYPE;
             } else if (is_set<T>::value) {
@@ -62,23 +62,146 @@ namespace utils {
                 return MAP_TYPE;
             } else if (is_pair<T>::value) {
                 return PAIR_TYPE;
-            } else if (std::is_same<T, std::string>::value) {
+            } else if (is_same<T, string>::value) {
                 return STRING_TYPE;
+            } else if (is_same<T, int>::value || is_same<T, float>::value || is_same<T, double>::value || is_same<T, char>::value || is_same<T, bool>::value) {
+                return BASE_TYPE;
             } else {
-                return 0;
+                return -1;
+            }
+        }
+
+        template<typename T>
+        string GetType(T data) {
+            switch (CheckType(data)) {
+                case BASE_TYPE:
+                    if (is_same<T, int>::value) {
+                        return "int";
+                    } else if (is_same<T, float>::value) {
+                        return "float";
+                    } else if (is_same<T, double>::value) {
+                        return "double";
+                    } else if (is_same<T, char>::value) {
+                        return "char";
+                    } else if (is_same<T, bool>::value) {
+                        return "bool";
+                    } else {
+                        return "unknown";
+                    }
+                case LIST_TYPE:
+                    return "std_list";
+                case SET_TYPE:
+                    return "std_set";
+                case VECTOR_TYPE:
+                    return "std_vector";
+                case MAP_TYPE:
+                    return "std_map";
+                case PAIR_TYPE:
+                    return "std_pair";
+                case STRING_TYPE:
+                    return "std_string";
+                default:
+                    return "unknown";
             }
         }
     }
 
+    namespace trans {
+        template <typename T>
+        T toType(string data) {
+            if (is_same<T, int>::value) {
+                return stoi(data);
+            } else if (is_same<T, float>::value) {
+                return stof(data);
+            } else if (is_same<T, double>::value) {
+                return stod(data);
+            } else if (is_same<T, char>::value) {
+                return data[0];
+            } else if (is_same<T, bool>::value) {
+               if (data == "true") {
+                   return true;
+               } else {
+                   return false;
+               }
+            } else {
+                return T();
+            }
+        }
+    }
+    
+    namespace size {
+        template <typename T>
+        int getSize(T data);
+        int getSize(string data);
+        template <typename T>
+        int getSize(list<T> data);
+        template <typename T>
+        int getSize(set<T> data);
+        template <typename T>
+        int getSize(vector<T> data);
+        template <typename T1, typename T2>
+        int getSize(map<T1, T2> data);
+        template <typename T1, typename T2>
+        int getSize(pair<T1, T2> data);
+
+        template <typename T>
+        int getSize(T data) {
+            return sizeof(data);
+        }
+        int getSize(string data) {
+            return data.length();
+        }
+        template <typename T>
+        int getSize(list<T> data) {
+            int ret = 0;
+            for (auto it = data.begin(); it != data.end(); ++it) {
+                ret += getSize(*it);
+            }
+            return ret;
+        }
+        template <typename T>
+        int getSize(set<T> data) {
+            int ret = 0;
+            for (auto it = data.begin(); it != data.end(); ++it) {
+                ret += getSize(*it);
+            }
+            return ret;
+        }
+        template <typename T>
+        int getSize(vector<T> data) {
+            int ret = 0;
+            for (auto it = data.begin(); it != data.end(); ++it) {
+                ret += getSize(*it);
+            }
+            return ret;
+        }
+        template <typename T1, typename T2>
+        int getSize(map<T1, T2> data) {
+            int ret = 0;
+            for (auto it = data.begin(); it != data.end(); ++it) {
+                ret += getSize(it->first);
+                ret += getSize(it->second);
+            }
+            return ret;
+        }
+        template <typename T1, typename T2>
+        int getSize(pair<T1, T2> data) {
+            int ret = 0;
+            ret += getSize(data.first);
+            ret += getSize(data.second);
+            return ret;
+        }
+    }
+
     namespace base64 {
-        static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        static const string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
         // encode data with base64
-        shared_ptr<char[]> encode(char *data) {
+        shared_ptr<char> encode(char *data) {
             int i = 0, j = 0;
             unsigned char origin[3], encoded[4];
             int len = strlen(data);
-            shared_ptr<char[]> ret = make_shared<char[]>(len * 4 / 3 + 1);
+            shared_ptr<char> ret(new char[len * 4 / 3 + 1]);
             while (len--) {
                 origin[i++] = *(data++);
                 if (i == 3) {
@@ -112,11 +235,11 @@ namespace utils {
         }
 
         // decode data with base64
-        shared_ptr<char[]> decode(char *data) {
+        shared_ptr<char> decode(char *data) {
             int i = 0, j = 0;
             unsigned char origin[4], decoded[3];
             int len = strlen(data);
-            shared_ptr<char[]> ret = make_shared<char[]>(len * 3 / 4 + 1);
+            shared_ptr<char> ret(new char[len * 3 / 4 + 1]);
             while (len--) {
                 if (*data == '=') {
                     break;

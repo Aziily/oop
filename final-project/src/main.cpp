@@ -3,6 +3,7 @@
 using namespace std;
 
 int main() {
-    TestBin();
+    Tester::TestBin();
+    Tester::TestXml();
     return 0;
 }

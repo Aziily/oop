@@ -5,59 +5,60 @@
 
 using namespace std;
 
-namespace Bin {
+namespace bin {
     template <typename T>
-    int getSize(T data) {
-        return sizeof(data);
-    }
+    bool writeSerialize(const T data, ofstream& outputFile);
+    bool writeSerialize(const string data, ofstream& outputFile);
     template <typename T>
-    int getSize(list<T> data) {
-        int ret = 0;
-        for (auto it = data.begin(); it != data.end(); ++it) {
-            ret += getSize(*it);
-        }
-        return ret;
-    }
+    bool writeSerialize(list<T> data, ofstream& outputFile);
     template <typename T>
-    int getSize(set<T> data) {
-        int ret = 0;
-        for (auto it = data.begin(); it != data.end(); ++it) {
-            ret += getSize(*it);
-        }
-        return ret;
-    }
+    bool writeSerialize(set<T> data, ofstream& outputFile);
     template <typename T>
-    int getSize(vector<T> data) {
-        int ret = 0;
-        for (auto it = data.begin(); it != data.end(); ++it) {
-            ret += getSize(*it);
-        }
-        return ret;
-    }
+    bool writeSerialize(vector<T> data, ofstream& outputFile);
     template <typename T1, typename T2>
-    int getSize(map<T1, T2> data) {
-        int ret = 0;
-        for (auto it = data.begin(); it != data.end(); ++it) {
-            ret += getSize(it->first);
-            ret += getSize(it->second);
-        }
-        return ret;
-    }
+    bool writeSerialize(map<T1, T2> data, ofstream& outputFile);
     template <typename T1, typename T2>
-    int getSize(pair<T1, T2> data) {
-        int ret = 0;
-        ret += getSize(data.first);
-        ret += getSize(data.second);
-        return ret;
-    }
+    bool writeSerialize(pair<T1, T2> data, ofstream& outputFile);
+
+    template <typename T>
+    bool readSerialize(T& data, ifstream& inputFile);
+    bool readSerialize(string& data, ifstream& inputFile);
+    template <typename T>
+    bool readSerialize(list<T>& data, ifstream& inputFile);
+    template <typename T>
+    bool readSerialize(set<T>& data, ifstream& inputFile);
+    template <typename T>
+    bool readSerialize(vector<T>& data, ifstream& inputFile);
+    template <typename T1, typename T2>
+    bool readSerialize(map<T1, T2>& data, ifstream& inputFile);
+    template <typename T1, typename T2>
+    bool readSerialize(pair<T1, T2>& data, ifstream& inputFile);
+
+    template <typename T>
+    bool Serialize(const T data, const string filename);
+    template <typename T>
+    bool Deserialize(T& data, const string filename);
 
     template <typename T>
     bool writeSerialize(const T data, ofstream& outputFile) {
-        cout << "data size: " << getSize(data) << endl;
+        // cout << "data size: " << utils::size::getSize(data) << endl;
         if (outputFile) {
-            int size = getSize(data);
-            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            int size = utils::size::getSize(data);
             outputFile.write(reinterpret_cast<const char*>(&data), size);
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    bool writeSerialize(const string data, ofstream& outputFile) {
+        // cout << "string size: " << utils::size::getSize(data) << endl;
+        if (outputFile) {
+            int size = utils::size::getSize(data);
+            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            for (int i = 0; i < size; ++i) {
+                outputFile.write(reinterpret_cast<const char*>(&data[i]), sizeof(data[i]));
+            }
             return true;
         } else {
             cerr << "无法打开文件" << endl;
@@ -66,7 +67,7 @@ namespace Bin {
     }
     template <typename T>
     bool writeSerialize(list<T> data, ofstream& outputFile) {
-        cout << "list size: " << data.size() << endl;
+        // cout << "list size: " << data.size() << endl;
         if (outputFile) {
             int size = data.size();
             outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -81,7 +82,7 @@ namespace Bin {
     }
     template <typename T>
     bool writeSerialize(set<T> data, ofstream& outputFile) {
-        cout << "set size: " << data.size() << endl;
+        // cout << "set size: " << data.size() << endl;
         if (outputFile) {
             int size = data.size();
             outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -96,7 +97,7 @@ namespace Bin {
     }
     template <typename T>
     bool writeSerialize(vector<T> data, ofstream& outputFile) {
-        cout << "vector size: " << data.size() << endl;
+        // cout << "vector size: " << data.size() << endl;
         if (outputFile) {
             int size = data.size();
             outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -111,7 +112,7 @@ namespace Bin {
     }
     template <typename T1, typename T2>
     bool writeSerialize(map<T1, T2> data, ofstream& outputFile) {
-        cout << "map size: " << data.size() << endl;
+        // cout << "map size: " << data.size() << endl;
         if (outputFile) {
             int size = data.size();
             outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -127,7 +128,7 @@ namespace Bin {
     }
     template <typename T1, typename T2>
     bool writeSerialize(pair<T1, T2> data, ofstream& outputFile) {
-        cout << "pair size: " << getSize(data) << endl;
+        // cout << "pair size: " << utils::size::getSize(data) << endl;
         if (outputFile) {
             writeSerialize(data.first, outputFile);
             writeSerialize(data.second, outputFile);
@@ -141,9 +142,25 @@ namespace Bin {
     template <typename T>
     bool readSerialize(T& data, ifstream& inputFile) {
         if (inputFile) {
+            int size = utils::size::getSize(data);
+            // cout << "data size: " << size << endl;
+            inputFile.read(reinterpret_cast<char*>(&data), size);
+            return true;
+        } else {
+            cerr << "无法打开文件" << endl;
+            return false;
+        }
+    }
+    bool readSerialize(string& data, ifstream& inputFile) {
+        if (inputFile) {
             int size;
             inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-            inputFile.read(reinterpret_cast<char*>(&data), size);
+            // cout << "string size: " << size << endl;
+            for (int i = 0; i < size; ++i) {
+                char tmp;
+                inputFile.read(reinterpret_cast<char*>(&tmp), sizeof(tmp));
+                data += tmp;
+            }
             return true;
         } else {
             cerr << "无法打开文件" << endl;
@@ -155,7 +172,7 @@ namespace Bin {
         if (inputFile) {
             int size;
             inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-            cout << "list size: " << size << endl;
+            // cout << "list size: " << size << endl;
             for (int i = 0; i < size; ++i) {
                 T tmp;
                 readSerialize(tmp, inputFile);
@@ -172,7 +189,7 @@ namespace Bin {
         if (inputFile) {
             int size;
             inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-            cout << "set size: " << size << endl;
+            // cout << "set size: " << size << endl;
             for (int i = 0; i < size; ++i) {
                 T tmp;
                 readSerialize(tmp, inputFile);
@@ -189,7 +206,7 @@ namespace Bin {
         if (inputFile) {
             int size;
             inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-            cout << "vector size: " << size << endl;
+            // cout << "vector size: " << size << endl;
             for (int i = 0; i < size; ++i) {
                 T tmp;
                 readSerialize(tmp, inputFile);
@@ -206,7 +223,7 @@ namespace Bin {
         if (inputFile) {
             int size;
             inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-            cout << "map size: " << size << endl;
+            // cout << "map size: " << size << endl;
             for (int i = 0; i < size; ++i) {
                 T1 tmp1;
                 T2 tmp2;
@@ -220,12 +237,20 @@ namespace Bin {
             return false;
         }
     }
+    static int cnt = 0;
     template <typename T1, typename T2>
     bool readSerialize(pair<T1, T2>& data, ifstream& inputFile) {
+        cnt++;
         if (inputFile) {
-            cout << "pair size: " << getSize(data) << endl;
+            bool flag = false;
+            // cout << "pair size: " << utils::size::getSize(data) << endl;
             readSerialize(data.first, inputFile);
+            // cout <<"cnt1: " << cnt << endl;
             readSerialize(data.second, inputFile);
+            if (!flag) {
+                flag = true;
+                // cout <<"cnt2: " << cnt << endl;
+            }
             return true;
         } else {
             cerr << "无法打开文件" << endl;
@@ -248,6 +273,7 @@ namespace Bin {
     template <typename T>
     bool Deserialize(T& data, const string filename) {
         ifstream inputFile(filename, ios::binary);
+        data = T();
         if (inputFile) {
             bool ok = readSerialize(data, inputFile);
             return ok;

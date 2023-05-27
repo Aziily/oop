@@ -4,5 +4,9 @@ build/
 temp/
 bin/
 obj/
+output/
 *.exe
 *.zip
+*.bin
+*.xml
+.DS_Store
