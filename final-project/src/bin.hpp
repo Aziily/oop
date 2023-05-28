@@ -20,6 +20,7 @@ namespace bin {
     template <typename T1, typename T2>
     bool writeSerialize(pair<T1, T2> data, ofstream& outputFile);
 
+
     template <typename T>
     bool readSerialize(T& data, ifstream& inputFile);
     bool readSerialize(string& data, ifstream& inputFile);
@@ -33,6 +34,7 @@ namespace bin {
     bool readSerialize(map<T1, T2>& data, ifstream& inputFile);
     template <typename T1, typename T2>
     bool readSerialize(pair<T1, T2>& data, ifstream& inputFile);
+
 
     template <typename T>
     bool Serialize(const T data, const string filename);
@@ -138,6 +140,7 @@ namespace bin {
             return false;
         }
     }
+
 
     template <typename T>
     bool readSerialize(T& data, ifstream& inputFile) {
@@ -263,11 +266,27 @@ namespace bin {
         ofstream outputFile(filename, ios::binary);
         if (outputFile) {
             bool ok = writeSerialize(data, outputFile);
+            outputFile.close();
             return ok;
         } else {
             cerr << "无法打开文件：" << filename << endl;
             return false;
         }
+    }
+    template <typename T>
+    bool Serialize(const unique_ptr<T>& data, const string filename) {
+        bool ok = Serialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Serialize(const shared_ptr<T>& data, const string filename) {
+        bool ok = Serialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Serialize(const weak_ptr<T>& data, const string filename) {
+        shared_ptr<T> tmp = data.lock();
+        return Serialize(tmp, filename);
     }
 
     template <typename T>
@@ -276,12 +295,63 @@ namespace bin {
         data = T();
         if (inputFile) {
             bool ok = readSerialize(data, inputFile);
+            inputFile.close();
             return ok;
         } else {
             cerr << "无法打开文件：" << filename << endl;
             return false;
         }
     }
+    template <typename T>
+    bool Deserialize(unique_ptr<T>& data, const string filename) {
+        data = make_unique<T>();
+        bool ok = Deserialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Deserialize(shared_ptr<T>& data, const string filename) {
+        data = make_shared<T>();
+        bool ok = Deserialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Deserialize(weak_ptr<T>& data, const string filename) {
+        shared_ptr<T> tmp = data.lock();
+        bool ok = Deserialize(tmp, filename);
+        return ok;
+    }
 };
+
+#define BEGIN_REGISTER_STRUCT_SERIALIZE_BIN(className)              bool SerializeBin(className data, const string filename) {\
+                                                                        ofstream outputFile(filename, ios::binary);\
+                                                                        if (outputFile) {\
+                                                                            bool ok = true;
+#define REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(memberName)                    ok = bin::writeSerialize(data.memberName, outputFile);\
+                                                                            if (!ok) {\
+                                                                                return false;\
+                                                                            }
+#define END_REGISTER_STRUCT_SERIALIZE_BIN()                                 outputFile.close();\
+                                                                            return ok;\
+                                                                        } else {\
+                                                                            cerr << "无法打开文件：" << filename << endl;\
+                                                                            return false;\
+                                                                        }\
+                                                                    }
+
+#define BEGIN_REGISTER_STRUCT_DESERIALIZE_BIN(className)            bool DeserializeBin(className& data, const string filename) {\
+                                                                        ifstream inputFile(filename, ios::binary);\
+                                                                        data = className();\
+                                                                        if (inputFile) {\
+                                                                            bool ok = true;
+#define REGISTER_STRUCT_MEMBER_DESERIALIZE_BIN(memberName)                  ok = bin::readSerialize(data.memberName, inputFile);\
+                                                                            if (!ok) {\
+                                                                                return false;\
+                                                                            }
+#define END_REGISTER_STRUCT_DESERIALIZE_BIN()                               return ok;\
+                                                                        } else {\
+                                                                            cerr << "无法打开文件：" << filename << endl;\
+                                                                            return false;\
+                                                                        }\
+                                                                    }
 
 #endif

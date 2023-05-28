@@ -312,7 +312,7 @@ namespace xml {
         if (outputFile) {
             origin << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
             origin << "<serialization>" << endl;
-            writeSerialize(data, origin, 1);
+            bool ok = writeSerialize(data, origin, 1);
             origin << "</serialization>" << endl;
             if (DEBUG) {
                 ofstream debugFile(filename + ".debug");
@@ -322,11 +322,27 @@ namespace xml {
             utils::base64::encode(origin, encoded);
             outputFile << encoded.str();
             outputFile.close();
-            return true;
+            return ok;
         } else {
             cerr << "无法打开文件" << endl;
             return false;
         }
+    }
+    template <typename T>
+    bool Serialize(const unique_ptr<T>& data, const string filename) {
+        bool ok = Serialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Serialize(const shared_ptr<T>& data, const string filename) {
+        bool ok = Serialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Serialize(const weak_ptr<T>& data, const string filename) {
+        shared_ptr<T> tmp = data.lock();
+        bool ok = Serialize(tmp, filename);
+        return ok;
     }
 
     template <typename T>
@@ -337,14 +353,79 @@ namespace xml {
         if (inputFile) {
             origin << inputFile.rdbuf();
             utils::base64::decode(origin, decoded);
-            readSerialize(data, decoded);
+            bool ok = readSerialize(data, decoded);
             inputFile.close();
-            return true;
+            return ok;
         } else {
             cerr << "无法打开文件" << endl;
             return false;
         }
     }
+    template <typename T>
+    bool Deserialize(unique_ptr<T>& data, const string filename) {
+        data = make_unique<T>();
+        bool ok = Deserialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Deserialize(shared_ptr<T>& data, const string filename) {
+        data = make_shared<T>();
+        bool ok = Deserialize(*data, filename);
+        return ok;
+    }
+    template <typename T>
+    bool Deserialize(weak_ptr<T>& data, const string filename) {
+        shared_ptr<T> tmp = data.lock();
+        bool ok = Deserialize(tmp, filename);
+        return ok;
+    }
 }
+
+#define BEGIN_REGISTER_STRUCT_SERIALIZE_XML(className)              bool SerializeXml(className data, const string filename) {\
+                                                                        ofstream outputFile(filename, ios::binary);\
+                                                                        stringstream origin, encoded;\
+                                                                        if (outputFile) {\
+                                                                            origin << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;\
+                                                                            origin << "<serialization>" << endl;\
+                                                                            bool ok = true;
+#define REGISTER_STRUCT_MEMBER_SERIALIZE_XML(memberName)                    ok = xml::writeSerialize(data.memberName, origin, 1);\
+                                                                            if (!ok) {\
+                                                                                return false;\
+                                                                            }
+#define END_REGISTER_STRUCT_SERIALIZE_XML()                                 origin << "</serialization>" << endl;\
+                                                                            if (DEBUG) {\
+                                                                                ofstream debugFile(filename + ".debug");\
+                                                                                debugFile << origin.str();\
+                                                                                debugFile.close();\
+                                                                            }\
+                                                                            utils::base64::encode(origin, encoded);\
+                                                                            outputFile << encoded.str();\
+                                                                            outputFile.close();\
+                                                                            return ok;\
+                                                                        } else {\
+                                                                            cerr << "无法打开文件：" << filename << endl;\
+                                                                            return false;\
+                                                                        }\
+                                                                    }
+
+#define BEGIN_REGISTER_STRUCT_DESERIALIZE_XML(className)            bool DeserializeXml(className& data, const string filename) {\
+                                                                        ifstream inputFile(filename, ios::binary);\
+                                                                        stringstream origin, decoded;\
+                                                                        data = className();\
+                                                                        if (inputFile) {\
+                                                                            origin << inputFile.rdbuf();\
+                                                                            utils::base64::decode(origin, decoded);\
+                                                                            bool ok = true;
+#define REGISTER_STRUCT_MEMBER_DESERIALIZE_XML(memberName)                  ok = xml::readSerialize(data.memberName, decoded);\
+                                                                            if (!ok) {\
+                                                                                return false;\
+                                                                            }
+#define END_REGISTER_STRUCT_DESERIALIZE_XML()                               inputFile.close();\
+                                                                            return ok;\
+                                                                        } else {\
+                                                                            cerr << "无法打开文件：" << filename << endl;\
+                                                                            return false;\
+                                                                        }\
+                                                                    }   
 
 #endif

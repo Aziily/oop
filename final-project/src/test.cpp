@@ -3,6 +3,34 @@
 
 using namespace std;
 
+struct test
+{
+    int idx;
+    std::string name;
+    std::vector<double> data;
+};
+BEGIN_REGISTER_STRUCT_SERIALIZE_BIN(test)
+    REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(idx)
+    REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(name)
+    REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(data)
+END_REGISTER_STRUCT_SERIALIZE_BIN()
+BEGIN_REGISTER_STRUCT_DESERIALIZE_BIN(test)
+    REGISTER_STRUCT_MEMBER_DESERIALIZE_BIN(idx)
+    REGISTER_STRUCT_MEMBER_DESERIALIZE_BIN(name)
+    REGISTER_STRUCT_MEMBER_DESERIALIZE_BIN(data)
+END_REGISTER_STRUCT_DESERIALIZE_BIN()
+
+BEGIN_REGISTER_STRUCT_SERIALIZE_XML(test)
+    REGISTER_STRUCT_MEMBER_SERIALIZE_XML(idx)
+    REGISTER_STRUCT_MEMBER_SERIALIZE_XML(name)
+    REGISTER_STRUCT_MEMBER_SERIALIZE_XML(data)
+END_REGISTER_STRUCT_SERIALIZE_XML()
+BEGIN_REGISTER_STRUCT_DESERIALIZE_XML(test)
+    REGISTER_STRUCT_MEMBER_DESERIALIZE_XML(idx)
+    REGISTER_STRUCT_MEMBER_DESERIALIZE_XML(name)
+    REGISTER_STRUCT_MEMBER_DESERIALIZE_XML(data)
+END_REGISTER_STRUCT_DESERIALIZE_XML()
+
 namespace Tester {
     static const string PRE = "../output/";
 
@@ -623,6 +651,208 @@ namespace Tester {
             total++;
         }
 
+        //test user-defined data structure
+        changeColor(YELLOW);
+        cout << "[begin] test struct test" << endl;
+        test t, t2;
+        t.idx = 1;
+        t.name = "hello";
+        t.data.push_back(1);
+        t.data.push_back(2);
+        t.data.push_back(3);
+        try {
+            SerializeBin(t, PRE + "t.bin");
+            DeserializeBin(t2, PRE + "t.bin");
+            bool flag = true;
+            for (auto it1 = t.data.begin(), it2 = t2.data.begin(); it1 != t.data.end() && it2 != t2.data.end(); ++it1, ++it2) {
+                if (*it1 != *it2) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (t.idx == t2.idx && t.name == t2.name && flag) {
+                changeColor(GREEN);
+                cout << "[pass] test struct test" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test struct test" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
+        //test unique_ptr
+        changeColor(YELLOW);
+        cout << "[begin] test unique_ptr" << endl;
+        unique_ptr<map<list<string>, vector<double>>> up, up2;
+        up.reset(new map<list<string>, vector<double>>);
+        for (int i = 0; i < 5; ++i) {
+            list<string> ls;
+            for (int j = 0; j < 5; ++j) {
+                ls.push_back("hello");
+            }
+            vector<double> vd;
+            for (int j = 0; j < 5; ++j) {
+                vd.push_back(1.1 * j);
+            }
+            up->insert({ls, vd});
+        }
+        try {
+            bin::Serialize(up, PRE + "up.bin");
+            bin::Deserialize(up2, PRE + "up.bin");
+            bool flag = true;
+            for (auto it1 = up->begin(), it2 = up2->begin(); it1 != up->end() && it2 != up2->end(); ++it1, ++it2) {
+                for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+                for (auto it3 = it1->second.begin(), it4 = it2->second.begin(); it3 != it1->second.end() && it4 != it2->second.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                changeColor(GREEN);
+                cout << "[pass] test unique_ptr" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test unique_ptr" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
+        //test shared_ptr
+        changeColor(YELLOW);
+        cout << "[begin] test shared_ptr" << endl;
+        shared_ptr<map<list<string>, vector<double>>> sp, sp2;
+        sp.reset(new map<list<string>, vector<double>>);
+        for (int i = 0; i < 5; ++i) {
+            list<string> ls;
+            for (int j = 0; j < 5; ++j) {
+                ls.push_back("hello");
+            }
+            vector<double> vd;
+            for (int j = 0; j < 5; ++j) {
+                vd.push_back(1.1 * j);
+            }
+            sp->insert({ls, vd});
+        }
+        try {
+            bin::Serialize(sp, PRE + "sp.bin");
+            bin::Deserialize(sp2, PRE + "sp.bin");
+            bool flag = true;
+            for (auto it1 = sp->begin(), it2 = sp2->begin(); it1 != sp->end() && it2 != sp2->end(); ++it1, ++it2) {
+                for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+                for (auto it3 = it1->second.begin(), it4 = it2->second.begin(); it3 != it1->second.end() && it4 != it2->second.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                changeColor(GREEN);
+                cout << "[pass] test shared_ptr" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test shared_ptr" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
+        //test weak_ptr
+        changeColor(YELLOW);
+        cout << "[begin] test weak_ptr" << endl;
+        weak_ptr<map<list<string>, vector<double>>> wp, wp2;
+        for (int i = 0; i < 5; ++i) {
+            list<string> ls;
+            for (int j = 0; j < 5; ++j) {
+                ls.push_back("world");
+            }
+            vector<double> vd;
+            for (int j = 0; j < 5; ++j) {
+                vd.push_back(1.2 * j);
+            }
+            sp->insert({ls, vd});
+        }
+        wp = sp;
+        wp2 = sp2;
+        try {
+            bin::Serialize(wp, PRE + "wp.bin");
+            bin::Deserialize(wp2, PRE + "wp.bin");
+            bool flag = true;
+            for (auto it1 = sp->begin(), it2 = wp2.lock()->begin(); it1 != sp->end() && it2 != wp2.lock()->end(); ++it1, ++it2) {
+                for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+                for (auto it3 = it1->second.begin(), it4 = it2->second.begin(); it3 != it1->second.end() && it4 != it2->second.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                changeColor(GREEN);
+                cout << "[pass] test weak_ptr" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test weak_ptr" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
         // output total result
         if (pass == total) {
             changeColor(GREEN);
@@ -1131,6 +1361,208 @@ namespace Tester {
             } else {
                 changeColor(RED);
                 cout << "[fail] test map<int, list<vector<pair<string, set<pair<char, float>>>>>>" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
+        //test user-defined data structure
+        changeColor(YELLOW);
+        cout << "[begin] test struct test" << endl;
+        test t, t2;
+        t.idx = 1;
+        t.name = "hello";
+        t.data.push_back(1);
+        t.data.push_back(2);
+        t.data.push_back(3);
+        try {
+            SerializeXml(t, PRE + "t.xml");
+            DeserializeXml(t2, PRE + "t.xml");
+            bool flag = true;
+            for (auto it1 = t.data.begin(), it2 = t2.data.begin(); it1 != t.data.end() && it2 != t2.data.end(); ++it1, ++it2) {
+                if (*it1 != *it2) {
+                    flag = false;
+                    break;
+                }
+            }
+            if (t.idx == t2.idx && t.name == t2.name && flag) {
+                changeColor(GREEN);
+                cout << "[pass] test struct test" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test struct test" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
+        //test unique_ptr
+        changeColor(YELLOW);
+        cout << "[begin] test unique_ptr" << endl;
+        unique_ptr<map<list<string>, vector<double>>> up, up2;
+        up.reset(new map<list<string>, vector<double>>);
+        for (int i = 0; i < 5; ++i) {
+            list<string> ls;
+            for (int j = 0; j < 5; ++j) {
+                ls.push_back("hello");
+            }
+            vector<double> vd;
+            for (int j = 0; j < 5; ++j) {
+                vd.push_back(1.1 * j);
+            }
+            up->insert({ls, vd});
+        }
+        try {
+            xml::Serialize(up, PRE + "up.xml");
+            xml::Deserialize(up2, PRE + "up.xml");
+            bool flag = true;
+            for (auto it1 = up->begin(), it2 = up2->begin(); it1 != up->end() && it2 != up2->end(); ++it1, ++it2) {
+                for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+                for (auto it3 = it1->second.begin(), it4 = it2->second.begin(); it3 != it1->second.end() && it4 != it2->second.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                changeColor(GREEN);
+                cout << "[pass] test unique_ptr" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test unique_ptr" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
+        //test shared_ptr
+        changeColor(YELLOW);
+        cout << "[begin] test shared_ptr" << endl;
+        shared_ptr<map<list<string>, vector<double>>> sp, sp2;
+        sp.reset(new map<list<string>, vector<double>>);
+        for (int i = 0; i < 5; ++i) {
+            list<string> ls;
+            for (int j = 0; j < 5; ++j) {
+                ls.push_back("hello");
+            }
+            vector<double> vd;
+            for (int j = 0; j < 5; ++j) {
+                vd.push_back(1.1 * j);
+            }
+            sp->insert({ls, vd});
+        }
+        try {
+            xml::Serialize(sp, PRE + "sp.xml");
+            xml::Deserialize(sp2, PRE + "sp.xml");
+            bool flag = true;
+            for (auto it1 = sp->begin(), it2 = sp2->begin(); it1 != sp->end() && it2 != sp2->end(); ++it1, ++it2) {
+                for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+                for (auto it3 = it1->second.begin(), it4 = it2->second.begin(); it3 != it1->second.end() && it4 != it2->second.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                changeColor(GREEN);
+                cout << "[pass] test shared_ptr" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test shared_ptr" << endl;
+                fail++;
+                total++;
+            }
+        }
+        catch(const std::exception& e)
+        {
+            changeColor(RED);
+            std::cerr << "[fail] " << e.what() << '\n';
+            fail++;
+            total++;
+        }
+
+        //test weak_ptr
+        changeColor(YELLOW);
+        cout << "[begin] test weak_ptr" << endl;
+        weak_ptr<map<list<string>, vector<double>>> wp, wp2;
+        for (int i = 0; i < 5; ++i) {
+            list<string> ls;
+            for (int j = 0; j < 5; ++j) {
+                ls.push_back("world");
+            }
+            vector<double> vd;
+            for (int j = 0; j < 5; ++j) {
+                vd.push_back(1.2 * j);
+            }
+            sp->insert({ls, vd});
+        }
+        wp = sp;
+        wp2 = sp2;
+        try {
+            xml::Serialize(wp, PRE + "wp.xml");
+            xml::Deserialize(wp2, PRE + "wp.xml");
+            bool flag = true;
+            for (auto it1 = sp->begin(), it2 = wp2.lock()->begin(); it1 != sp->end() && it2 != wp2.lock()->end(); ++it1, ++it2) {
+                for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+                for (auto it3 = it1->second.begin(), it4 = it2->second.begin(); it3 != it1->second.end() && it4 != it2->second.end(); ++it3, ++it4) {
+                    if (*it3 != *it4) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                changeColor(GREEN);
+                cout << "[pass] test weak_ptr" << endl;
+                pass++;
+                total++;
+            } else {
+                changeColor(RED);
+                cout << "[fail] test weak_ptr" << endl;
                 fail++;
                 total++;
             }
