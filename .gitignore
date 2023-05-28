@@ -9,4 +9,5 @@ output/
 *.zip
 *.bin
 *.xml
+*.debug
 .DS_Store

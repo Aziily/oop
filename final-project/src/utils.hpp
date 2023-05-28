@@ -11,6 +11,8 @@
 #include <memory>
 #include <cstring>
 #include <fstream>
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -118,7 +120,7 @@ namespace utils {
             } else if (is_same<T, char>::value) {
                 return data[0];
             } else if (is_same<T, bool>::value) {
-               if (data == "true") {
+               if (data == "1") {
                    return true;
                } else {
                    return false;
@@ -197,83 +199,81 @@ namespace utils {
         static const string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
         // encode data with base64
-        shared_ptr<char> encode(char *data) {
+        void encode(stringstream& data, stringstream &dst) {
             int i = 0, j = 0;
+            stringstream temp;
+            string tmp = data.str();
             unsigned char origin[3], encoded[4];
-            int len = strlen(data);
-            shared_ptr<char> ret(new char[len * 4 / 3 + 1]);
-            while (len--) {
-                origin[i++] = *(data++);
-                if (i == 3) {
+            while (i < tmp.length()) {
+                origin[j++] = tmp[i++];
+                if (j == 3) {
                     encoded[0] = (origin[0] & 0xfc) >> 2;
                     encoded[1] = ((origin[0] & 0x3) << 4) + ((origin[1] & 0xf0) >> 4);
                     encoded[2] = ((origin[1] & 0xf) << 2) + ((origin[2] & 0xc0) >> 6);
                     encoded[3] = origin[2] & 0x3f;
-                    for (i = 0; i < 4; i++) {
-                        ret.get()[j++] = base64_chars[encoded[i]];
+                    for (j = 0; j < 4; j++) {
+                        temp << base64_chars[encoded[j]];
                     }
-                    i = 0;
+                    j = 0;
                 }
             }
-            if (i) {
-                for (int k = i; k < 3; k++) {
-                    origin[k] = '\0';
+            if (j) {
+                for (i = j; i < 3; i++) {
+                    origin[i] = '\0';
                 }
                 encoded[0] = (origin[0] & 0xfc) >> 2;
                 encoded[1] = ((origin[0] & 0x3) << 4) + ((origin[1] & 0xf0) >> 4);
                 encoded[2] = ((origin[1] & 0xf) << 2) + ((origin[2] & 0xc0) >> 6);
                 encoded[3] = origin[2] & 0x3f;
-                for (int k = 0; k < i + 1; k++) {
-                    ret.get()[j++] = base64_chars[encoded[k]];
+                for (i = 0; i < j + 1; i++) {
+                    temp << base64_chars[encoded[i]];
                 }
-                while (i++ < 3) {
-                    ret.get()[j++] = '=';
+                while (j++ < 3) {
+                    temp << '=';
                 }
             }
-            ret.get()[j] = '\0';
-            return ret;
+            dst.str(temp.str());
         }
 
         // decode data with base64
-        shared_ptr<char> decode(char *data) {
+        void decode(stringstream& data, stringstream &dst) {
             int i = 0, j = 0;
+            stringstream temp;
+            string tmp = data.str();
             unsigned char origin[4], decoded[3];
-            int len = strlen(data);
-            shared_ptr<char> ret(new char[len * 3 / 4 + 1]);
-            while (len--) {
-                if (*data == '=') {
+            while (i < tmp.length()) {
+                if (tmp[i] == '=') {
                     break;
                 }
-                origin[i++] = *(data++);
-                if (i == 4) {
-                    for (i = 0; i < 4; i++) {
-                        origin[i] = base64_chars.find(origin[i]);
+                origin[j++] = tmp[i++];
+                if (j == 4) {
+                    for (j = 0; j < 4; j++) {
+                        origin[j] = base64_chars.find(origin[j]);
                     }
                     decoded[0] = (origin[0] << 2) + ((origin[1] & 0x30) >> 4);
                     decoded[1] = ((origin[1] & 0xf) << 4) + ((origin[2] & 0x3c) >> 2);
                     decoded[2] = ((origin[2] & 0x3) << 6) + origin[3];
-                    for (i = 0; i < 3; i++) {
-                        ret.get()[j++] = decoded[i];
+                    for (j = 0; j < 3; j++) {
+                        temp << decoded[j];
                     }
-                    i = 0;
+                    j = 0;
                 }
             }
-            if (i) {
-                for (int k = i; k < 4; k++) {
-                    origin[k] = '\0';
+            if (j) {
+                for (i = j; i < 4; i++) {
+                    origin[i] = '\0';
                 }
-                for (int k = 0; k < 4; k++) {
-                    origin[k] = base64_chars.find(origin[k]);
+                for (i = 0; i < 4; i++) {
+                    origin[i] = base64_chars.find(origin[i]);
                 }
                 decoded[0] = (origin[0] << 2) + ((origin[1] & 0x30) >> 4);
                 decoded[1] = ((origin[1] & 0xf) << 4) + ((origin[2] & 0x3c) >> 2);
                 decoded[2] = ((origin[2] & 0x3) << 6) + origin[3];
-                for (int k = 0; k < i - 1; k++) {
-                    ret.get()[j++] = decoded[k];
+                for (i = 0; i < j - 1; i++) {
+                    temp << decoded[i];
                 }
             }
-            ret.get()[j] = '\0';
-            return ret;
+            dst.str(temp.str());
         }
     }
 }
