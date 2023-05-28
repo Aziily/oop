@@ -18,6 +18,6 @@ cd bin
 cd ..
 
 # clear
-# rm -rf bin
-# rm -rf temp
-# rm -rf output
+rm -rf bin
+rm -rf temp
+rm -rf output

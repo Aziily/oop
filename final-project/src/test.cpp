@@ -3,12 +3,14 @@
 
 using namespace std;
 
+/// @brief the struct to test
 struct test
 {
     int idx;
     std::string name;
     std::vector<double> data;
 };
+// register the struct to binary serialization and deserialization
 BEGIN_REGISTER_STRUCT_SERIALIZE_BIN(test)
     REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(idx)
     REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(name)
@@ -20,6 +22,7 @@ BEGIN_REGISTER_STRUCT_DESERIALIZE_BIN(test)
     REGISTER_STRUCT_MEMBER_DESERIALIZE_BIN(data)
 END_REGISTER_STRUCT_DESERIALIZE_BIN()
 
+// register the struct to xml serialization and deserialization
 BEGIN_REGISTER_STRUCT_SERIALIZE_XML(test)
     REGISTER_STRUCT_MEMBER_SERIALIZE_XML(idx)
     REGISTER_STRUCT_MEMBER_SERIALIZE_XML(name)
@@ -31,200 +34,146 @@ BEGIN_REGISTER_STRUCT_DESERIALIZE_XML(test)
     REGISTER_STRUCT_MEMBER_DESERIALIZE_XML(data)
 END_REGISTER_STRUCT_DESERIALIZE_XML()
 
-namespace Tester {
-    static const string PRE = "../output/";
 
-    static const string WHITE = "\033[0m";
-    static const string RED = "\033[31m";
-    static const string GREEN = "\033[32m";
-    static const string CYAN = "\033[36m";
-    static const string YELLOW = "\033[33m";
-    static const string PURPLE = "\033[35m";
+#define HEAD(name)  changeColor(CYAN);\
+                    cout << "================================================================================" << endl;\
+                    cout << "Begin test of " << name << " serialization and deserialization" << endl;\
+                    cout << "================================================================================" << endl;\
+                    int pass = 0, fail = 0, total = 0;
+#define BEGIN(name) changeColor(YELLOW);\
+                    cout << "[begin] test " << name << endl;
+#define PASS(name)  changeColor(GREEN);\
+                    cout << "[pass] test " << name << endl;\
+                    pass++;\
+                    total++;
+#define FAIL(name)  changeColor(RED);\
+                    cout << "[fail] test " << name << endl;\
+                    fail++;\
+                    total++;
+#define ERROR   catch(const std::exception& e)\
+                {\
+                    changeColor(RED);\
+                    std::cerr << "[fail] " << e.what() << '\n';\
+                    fail++;\
+                    total++;\
+                }
 
+/// @brief the namespace contains some test functions
+namespace tester {
+    static const string PRE = "../output/";     // the prefix of output file
+
+    static const string WHITE = "\033[0m";      // white color
+    static const string RED = "\033[31m";       // red color
+    static const string GREEN = "\033[32m";     // green color
+    static const string CYAN = "\033[36m";      // cyan color
+    static const string YELLOW = "\033[33m";    // yellow color
+    static const string PURPLE = "\033[35m";    // purple color
+
+    /// @brief change the color of output
+    /// @param color the color to change
     void changeColor(string color) {
         cout << color;
     }
 
+    /// @brief test binary serialization and deserialization with different types
+    /// @return true if all tests pass, false if any test fails
     bool TestBin() {
-        changeColor(CYAN);
-        cout << "========================================" << endl;
-        cout << "Begin test of binary serialization" << endl;
-        cout << "========================================" << endl;
-        int pass = 0, fail = 0, total = 0;
+        HEAD("binary");
 
-        //test bool
-        changeColor(YELLOW);
-        cout << "[begin] test bool" << endl;
+        // test bool
+        BEGIN("bool");
         bool b = true, b2;
         try
         {
             bin::Serialize(b, PRE + "b.bin");
             bin::Deserialize(b2, PRE + "b.bin");
             if (b == b2) {
-                changeColor(GREEN);
-                cout << "[pass] test bool" << endl;
-                pass++;
-                total++;
+                PASS("bool");
             } else {
-                changeColor(RED);
-                cout << "[fail] test bool" << endl;
-                fail++;
-                total++;
+                FAIL("bool");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test char
-        changeColor(YELLOW);
-        cout << "[begin] test char" << endl;
+        // test char
+        BEGIN("char");
         char c = 'a', c2;
         try
         {
             bin::Serialize(c, PRE + "c.bin");
             bin::Deserialize(c2, PRE + "c.bin");
             if (c == c2) {
-                changeColor(GREEN);
-                cout << "[pass] test char" << endl;
-                pass++;
-                total++;
+                PASS("char");
             } else {
-                changeColor(RED);
-                cout << "[fail] test char" << endl;
-                fail++;
-                total++;
+                FAIL("char");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test int
-        changeColor(YELLOW);
-        cout << "[begin] test int" << endl;
+        // test int
+        BEGIN("int");
         int num = 123456789, num2;
         try
         {
             bin::Serialize(num, PRE + "num.bin");
             bin::Deserialize(num2, PRE + "num.bin");
             if (num == num2) {
-                changeColor(GREEN);
-                cout << "[pass] test int" << endl;
-                pass++;
-                total++;
+                PASS("int");
             } else {
-                changeColor(RED);
-                cout << "[fail] test int" << endl;
-                fail++;
-                total++;
+                FAIL("int");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test float
-        changeColor(YELLOW);
-        cout << "[begin] test float" << endl;
+        // test float
+        BEGIN("float");
         float f = 188.888888, f2;
         try
         {
             bin::Serialize(f, PRE + "f.bin");
             bin::Deserialize(f2, PRE + "f.bin");
             if (f == f2) {
-                changeColor(GREEN);
-                cout << "[pass] test float" << endl;
-                pass++;
-                total++;
+                PASS("float");
             } else {
-                changeColor(RED);
-                cout << "[fail] test float" << endl;
-                fail++;
-                total++;
+                FAIL("float");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
         
 
-        //test double
-        changeColor(YELLOW);
-        cout << "[begin] test double" << endl;
+        // test double
+        BEGIN("double");
         double d = 123456789.123456789, d2;
         try
         {
             bin::Serialize(d, PRE + "d.bin");
             bin::Deserialize(d2, PRE + "d.bin");
             if (d == d2) {
-                changeColor(GREEN);
-                cout << "[pass] test double" << endl;
-                pass++;
-                total++;
+                PASS("double");
             } else {
-                changeColor(RED);
-                cout << "[fail] test double" << endl;
-                fail++;
-                total++;
+                FAIL("double");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
         
-        //test string
-        changeColor(YELLOW);
-        cout << "[begin] test string" << endl;
+        // test string
+        BEGIN("string");
         string str = "Hello World!", str2;
         try
         {
             bin::Serialize(str, PRE + "str.bin");
             bin::Deserialize(str2, PRE + "str.bin");
             if (str == str2) {
-                changeColor(GREEN);
-                cout << "[pass] test string" << endl;
-                pass++;
-                total++;
+                PASS("string");
             } else {
-                changeColor(RED);
-                cout << "[fail] test string" << endl;
-                fail++;
-                total++;
+                FAIL("string");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test list
-        changeColor(YELLOW);
-        cout << "[begin] test list" << endl;
+        // test list
+        BEGIN("list");
         list<int> l = {1, 2, 3, 4, 5}, l2;
         try
         {
@@ -238,28 +187,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test list" << endl;
-                pass++;
-                total++;
+                PASS("list");
             } else {
-                changeColor(RED);
-                cout << "[fail] test list" << endl;
-                fail++;
-                total++;
+                FAIL("list");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test set
-        changeColor(YELLOW);
-        cout << "[begin] test set" << endl;
+        // test set
+        BEGIN("set");
         set<int> s = {1, 2, 3, 4, 5}, s2;
         try
         {
@@ -273,28 +209,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test set" << endl;
-                pass++;
-                total++;
+                PASS("set");
             } else {
-                changeColor(RED);
-                cout << "[fail] test set" << endl;
-                fail++;
-                total++;
+                FAIL("set");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test vector
-        changeColor(YELLOW);
-        cout << "[begin] test vector" << endl;
+        // test vector
+        BEGIN("vector");
         vector<int> v = {1, 2, 3, 4, 5}, v2;
         try
         {
@@ -308,28 +231,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test vector" << endl;
-                pass++;
-                total++;
+                PASS("vector");
             } else {
-                changeColor(RED);
-                cout << "[fail] test vector" << endl;
-                fail++;
-                total++;
+                FAIL("vector");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test map
-        changeColor(YELLOW);
-        cout << "[begin] test map" << endl;
+        // test map
+        BEGIN("map");
         map<int, int> m = {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}}, m2;
         try
         {
@@ -343,56 +253,30 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test map" << endl;
-                pass++;
-                total++;
+                PASS("map");
             } else {
-                changeColor(RED);
-                cout << "[fail] test map" << endl;
-                fail++;
-                total++;
+                FAIL("map");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test pair
-        changeColor(YELLOW);
-        cout << "[begin] test pair" << endl;
+        // test pair
+        BEGIN("pair");
         pair<int, int> p = {1, 1}, p2;
         try
         {
             bin::Serialize(p, PRE + "p.bin");
             bin::Deserialize(p2, PRE + "p.bin");
             if (p.first == p2.first && p.second == p2.second) {
-                changeColor(GREEN);
-                cout << "[pass] test pair" << endl;
-                pass++;
-                total++;
+                PASS("pair");
             } else {
-                changeColor(RED);
-                cout << "[fail] test pair" << endl;
-                fail++;
-                total++;
+                FAIL("pair");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test map<int, list<int>>" << endl;
+        // test composed data structure
+        BEGIN("map<int, list<int>>");
         map<int, list<int>> ml = {
             {1, {1, 2, 3, 4, 5}},
             {2, {6, 7, 8, 9, 10}},
@@ -418,28 +302,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test map<int, list<int>>" << endl;
-                pass++;
-                total++;
+                PASS("map<int, list<int>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test map<int, list<int>>" << endl;
-                fail++;
-                total++;
+                FAIL("map<int, list<int>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test vector<list<int>>" << endl;
+        // test composed data structure
+        BEGIN("vector<list<int>>");
         vector<list<int>> vl = {
             {1, 2, 3, 4, 5},
             {6, 7, 8, 9, 10},
@@ -461,28 +332,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test vector<list<int>>" << endl;
-                pass++;
-                total++;
+                PASS("vector<list<int>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test vector<list<int>>" << endl;
-                fail++;
-                total++;
+                FAIL("vector<list<int>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test set<list<int>>" << endl;
+        // test composed data structure
+        BEGIN("set<list<int>>");
         set<list<int>> sl = {
             {1, 2, 3, 4, 5},
             {6, 7, 8, 9, 10},
@@ -504,28 +362,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test set<list<int>>" << endl;
-                pass++;
-                total++;
+                PASS("set<list<int>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test set<list<int>>" << endl;
-                fail++;
-                total++;
+                FAIL("set<list<int>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test map<int, set<int>>" << endl;     
+        // test composed data structure
+        BEGIN("map<int, vector<pair<list<char>, set<float>>>>");
         map<int, vector<pair<list<char>, set<float>>>> mvl, mvl2;
         for (int i = 0; i < 5; ++i) {
             vector<pair<list<char>, set<float>>> vps;
@@ -568,28 +413,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test map<int, vector<pair<list<char>, set<float>>>>" << endl;
-                pass++;
-                total++;
+                PASS("map<int, vector<pair<list<char>, set<float>>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test map<int, vector<pair<list<char>, set<float>>>>" << endl;
-                fail++;
-                total++;
+                FAIL("map<int, vector<pair<list<char>, set<float>>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test map<int, list<vector<pair<string, set<pair<char, float>>>>>>" << endl;
+        // test composed data structure
+        BEGIN("map<int, list<vector<pair<string, set<pair<char, float>>>>>>");
         map<int, list<vector<pair<string, set<pair<char, float>>>>>> mlvl, mlvl2;
         for (int i = 0; i < 5; ++i) {
             list<vector<pair<string, set<pair<char, float>>>>> lvl;
@@ -632,28 +464,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test map<int, list<vector<pair<string, set<pair<char, float>>>>>>" << endl;
-                pass++;
-                total++;
+                PASS("map<int, list<vector<pair<string, set<pair<char, float>>>>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test map<int, list<vector<pair<string, set<pair<char, float>>>>>>" << endl;
-                fail++;
-                total++;
+                FAIL("map<int, list<vector<pair<string, set<pair<char, float>>>>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test user-defined data structure
-        changeColor(YELLOW);
-        cout << "[begin] test struct test" << endl;
+        // test user-defined data structure
+        BEGIN("struct test");
         test t, t2;
         t.idx = 1;
         t.name = "hello";
@@ -671,28 +490,15 @@ namespace Tester {
                 }
             }
             if (t.idx == t2.idx && t.name == t2.name && flag) {
-                changeColor(GREEN);
-                cout << "[pass] test struct test" << endl;
-                pass++;
-                total++;
+                PASS("struct test");
             } else {
-                changeColor(RED);
-                cout << "[fail] test struct test" << endl;
-                fail++;
-                total++;
+                FAIL("struct test");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test unique_ptr
-        changeColor(YELLOW);
-        cout << "[begin] test unique_ptr" << endl;
+        // test unique_ptr
+        BEGIN("unique_ptr<map<list<string>, vector<double>>>");
         unique_ptr<map<list<string>, vector<double>>> up, up2;
         up.reset(new map<list<string>, vector<double>>);
         for (int i = 0; i < 5; ++i) {
@@ -725,28 +531,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test unique_ptr" << endl;
-                pass++;
-                total++;
+                PASS("unique_ptr<map<list<string>, vector<double>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test unique_ptr" << endl;
-                fail++;
-                total++;
+                FAIL("unique_ptr<map<list<string>, vector<double>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test shared_ptr
-        changeColor(YELLOW);
-        cout << "[begin] test shared_ptr" << endl;
+        // test shared_ptr
+        BEGIN("shared_ptr<map<list<string>, vector<double>>>");
         shared_ptr<map<list<string>, vector<double>>> sp, sp2;
         sp.reset(new map<list<string>, vector<double>>);
         for (int i = 0; i < 5; ++i) {
@@ -779,28 +572,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test shared_ptr" << endl;
-                pass++;
-                total++;
+                PASS("shared_ptr<map<list<string>, vector<double>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test shared_ptr" << endl;
-                fail++;
-                total++;
+                FAIL("shared_ptr<map<list<string>, vector<double>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test weak_ptr
-        changeColor(YELLOW);
-        cout << "[begin] test weak_ptr" << endl;
+        // test weak_ptr
+        BEGIN("weak_ptr<map<list<string>, vector<double>>>");
         weak_ptr<map<list<string>, vector<double>>> wp, wp2;
         for (int i = 0; i < 5; ++i) {
             list<string> ls;
@@ -834,24 +614,12 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test weak_ptr" << endl;
-                pass++;
-                total++;
+                PASS("weak_ptr<map<list<string>, vector<double>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test weak_ptr" << endl;
-                fail++;
-                total++;
+                FAIL("weak_ptr<map<list<string>, vector<double>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
         // output total result
         if (pass == total) {
@@ -865,184 +633,103 @@ namespace Tester {
         }
     }
 
+    /// @brief test xml serialization and deserialization with different types
+    /// @return true if all tests pass, false otherwise
     bool TestXml() {
-        changeColor(CYAN);
-        cout << "========================================" << endl;
-        cout << "Begin test of xml serialization" << endl;
-        cout << "========================================" << endl;
-        int pass = 0, fail = 0, total = 0;
+        HEAD("xml");
 
-        //test bool
-        changeColor(YELLOW);
-        cout << "[begin] test bool" << endl;
+        // test bool
+        BEGIN("bool");
         bool b = true, b2;
         try
         {
             xml::Serialize(b, PRE + "b.xml");
             xml::Deserialize(b2, PRE + "b.xml");
             if (b == b2) {
-                changeColor(GREEN);
-                cout << "[pass] test bool" << endl;
-                pass++;
-                total++;
+                PASS("bool");
             } else {
-                changeColor(RED);
-                cout << "[fail] test bool" << endl;
-                fail++;
-                total++;
+                FAIL("bool");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test char
-        changeColor(YELLOW);
-        cout << "[begin] test char" << endl;
+        // test char
+        BEGIN("char");
         char c = 'a', c2;
         try
         {
             xml::Serialize(c, PRE + "c.xml");
             xml::Deserialize(c2, PRE + "c.xml");
             if (c == c2) {
-                changeColor(GREEN);
-                cout << "[pass] test char" << endl;
-                pass++;
-                total++;
+                PASS("char");
             } else {
-                changeColor(RED);
-                cout << "[fail] test char" << endl;
-                fail++;
-                total++;
+                FAIL("char");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test int
-        changeColor(YELLOW);
-        cout << "[begin] test int" << endl;
+        // test int
+        BEGIN("int");
         int i = 123456789, i2;
         try
         {
             xml::Serialize(i, PRE + "i.xml");
             xml::Deserialize(i2, PRE + "i.xml");
             if (i == i2) {
-                changeColor(GREEN);
-                cout << "[pass] test int" << endl;
-                pass++;
-                total++;
+                PASS("int");
             } else {
-                changeColor(RED);
-                cout << "[fail] test int" << endl;
-                fail++;
-                total++;
+                FAIL("int");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test float
-        changeColor(YELLOW);
-        cout << "[begin] test float" << endl;
+        // test float
+        BEGIN("float");
         float f = 123.456f, f2;
         try
         {
             xml::Serialize(f, PRE + "f.xml");
             xml::Deserialize(f2, PRE + "f.xml");
             if (f == f2) {
-                changeColor(GREEN);
-                cout << "[pass] test float" << endl;
-                pass++;
-                total++;
+                PASS("float");
             } else {
-                changeColor(RED);
-                cout << "[fail] test float" << endl;
-                fail++;
-                total++;
+                FAIL("float");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test double
-        changeColor(YELLOW);
-        cout << "[begin] test double" << endl;
+        // test double
+        BEGIN("double");
         double d = 123.456789128192112, d2;
         try
         {
             xml::Serialize(d, PRE + "d.xml");
             xml::Deserialize(d2, PRE + "d.xml");
             if (d == d2) {
-                changeColor(GREEN);
-                cout << "[pass] test double" << endl;
-                pass++;
-                total++;
+                PASS("double");
             } else {
-                changeColor(RED);
-                cout << "[fail] test double" << endl;
-                fail++;
-                total++;
+                FAIL("double");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test string
-        changeColor(YELLOW);
-        cout << "[begin] test string" << endl;
+        // test string
+        BEGIN("string");
         string s = "hello world", s2;
         try
         {
             xml::Serialize(s, PRE + "s.xml");
             xml::Deserialize(s2, PRE + "s.xml");
             if (s == s2) {
-                changeColor(GREEN);
-                cout << "[pass] test string" << endl;
-                pass++;
-                total++;
+                PASS("string");
             } else {
-                changeColor(RED);
-                cout << "[fail] test string" << endl;
-                fail++;
-                total++;
+                FAIL("string");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test vector
-        changeColor(YELLOW);
-        cout << "[begin] test vector" << endl;
+        // test vector
+        BEGIN("vector");
         vector<int> v = {1, 2, 3, 4, 5}, v2;
         try
         {
@@ -1056,28 +743,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test vector" << endl;
-                pass++;
-                total++;
+                PASS("vector");
             } else {
-                changeColor(RED);
-                cout << "[fail] test vector" << endl;
-                fail++;
-                total++;
+                FAIL("vector");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test list
-        changeColor(YELLOW);
-        cout << "[begin] test list" << endl;
+        // test list
+        BEGIN("list");
         list<int> l = {1, 2, 3, 4, 5}, l2;
         try
         {
@@ -1093,28 +767,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test list" << endl;
-                pass++;
-                total++;
+                PASS("list");
             } else {
-                changeColor(RED);
-                cout << "[fail] test list" << endl;
-                fail++;
-                total++;
+                FAIL("list");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test set
-        changeColor(YELLOW);
-        cout << "[begin] test set" << endl;
+        // test set
+        BEGIN("set");
         set<int> se = {1, 2, 3, 4, 5}, se2;
         try
         {
@@ -1130,28 +791,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test set" << endl;
-                pass++;
-                total++;
+                PASS("set");
             } else {
-                changeColor(RED);
-                cout << "[fail] test set" << endl;
-                fail++;
-                total++;
+                FAIL("set");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test map
-        changeColor(YELLOW);
-        cout << "[begin] test map" << endl;
+        // test map
+        BEGIN("map");
         map<int, string> m = {{1, "a"}, {2, "b"}, {3, "c"}}, m2;
         try
         {
@@ -1167,56 +815,30 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test map" << endl;
-                pass++;
-                total++;
+                PASS("map");
             } else {
-                changeColor(RED);
-                cout << "[fail] test map" << endl;
-                fail++;
-                total++;
+                FAIL("map");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test pair
-        changeColor(YELLOW);
-        cout << "[begin] test pair" << endl;
+        // test pair
+        BEGIN("pair");
         pair<int, string> p = {1, "a"}, p2;
         try
         {
             xml::Serialize(p, PRE + "p.xml");
             xml::Deserialize(p2, PRE + "p.xml");
             if (p.first == p2.first && p.second == p2.second) {
-                changeColor(GREEN);
-                cout << "[pass] test pair" << endl;
-                pass++;
-                total++;
+                PASS("pair");
             } else {
-                changeColor(RED);
-                cout << "[fail] test pair" << endl;
-                fail++;
-                total++;
+                FAIL("pair");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test vector<list<set<int>>>" << endl;
+        // test composed data structure
+        BEGIN("vector<list<set<int>>>");
         vector<list<set<int>>> vls = {{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}}, vls2;
         try
         {
@@ -1240,28 +862,15 @@ namespace Tester {
                 if (!flag) break;
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test vector<list<set<int>>>" << endl;
-                pass++;
-                total++;
+                PASS("vector<list<set<int>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test vector<list<set<int>>>" << endl;
-                fail++;
-                total++;
+                FAIL("vector<list<set<int>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test map<int, vector<list<set<int>>>>" << endl;
+        // test composed data structure
+        BEGIN("map<int, vector<list<set<int>>>>");
         map<int, vector<list<set<int>>>> mvls = {{1, {{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}}}}, mvls2;
         try
         {
@@ -1290,28 +899,15 @@ namespace Tester {
                 if (!flag) break;
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test map<int, vector<list<set<int>>>>" << endl;
-                pass++;
-                total++;
+                PASS("map<int, vector<list<set<int>>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test map<int, vector<list<set<int>>>>" << endl;
-                fail++;
-                total++;
+                FAIL("map<int, vector<list<set<int>>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test composed data structure
-        changeColor(YELLOW);
-        cout << "[begin] test map<int, vector<list<set<int>>>>" << endl;
+        // test composed data structure
+        BEGIN("map<int, vector<list<set<pair<int, string>>>>>");
         map<int, list<vector<pair<string, set<pair<char, float>>>>>> mlvl, mlvl2;
         for (int i = 0; i < 5; ++i) {
             list<vector<pair<string, set<pair<char, float>>>>> lvl;
@@ -1354,28 +950,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test map<int, list<vector<pair<string, set<pair<char, float>>>>>>" << endl;
-                pass++;
-                total++;
+                PASS("map<int, list<vector<pair<string, set<pair<char, float>>>>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test map<int, list<vector<pair<string, set<pair<char, float>>>>>>" << endl;
-                fail++;
-                total++;
+                FAIL("map<int, list<vector<pair<string, set<pair<char, float>>>>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test user-defined data structure
-        changeColor(YELLOW);
-        cout << "[begin] test struct test" << endl;
+        // test user-defined data structure
+        BEGIN("struct test");
         test t, t2;
         t.idx = 1;
         t.name = "hello";
@@ -1393,28 +976,15 @@ namespace Tester {
                 }
             }
             if (t.idx == t2.idx && t.name == t2.name && flag) {
-                changeColor(GREEN);
-                cout << "[pass] test struct test" << endl;
-                pass++;
-                total++;
+                PASS("struct test");
             } else {
-                changeColor(RED);
-                cout << "[fail] test struct test" << endl;
-                fail++;
-                total++;
+                FAIL("struct test");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test unique_ptr
-        changeColor(YELLOW);
-        cout << "[begin] test unique_ptr" << endl;
+        // test unique_ptr
+        BEGIN("unique_ptr<map<list<string>, vector<double>>>");
         unique_ptr<map<list<string>, vector<double>>> up, up2;
         up.reset(new map<list<string>, vector<double>>);
         for (int i = 0; i < 5; ++i) {
@@ -1447,28 +1017,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test unique_ptr" << endl;
-                pass++;
-                total++;
+                PASS("unique_ptr<map<list<string>, vector<double>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test unique_ptr" << endl;
-                fail++;
-                total++;
+                FAIL("unique_ptr<map<list<string>, vector<double>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test shared_ptr
-        changeColor(YELLOW);
-        cout << "[begin] test shared_ptr" << endl;
+        // test shared_ptr
+        BEGIN("shared_ptr<map<list<string>, vector<double>>>");
         shared_ptr<map<list<string>, vector<double>>> sp, sp2;
         sp.reset(new map<list<string>, vector<double>>);
         for (int i = 0; i < 5; ++i) {
@@ -1501,28 +1058,15 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test shared_ptr" << endl;
-                pass++;
-                total++;
+                PASS("shared_ptr<map<list<string>, vector<double>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test shared_ptr" << endl;
-                fail++;
-                total++;
+                FAIL("shared_ptr<map<list<string>, vector<double>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
-        //test weak_ptr
-        changeColor(YELLOW);
-        cout << "[begin] test weak_ptr" << endl;
+        // test weak_ptr
+        BEGIN("weak_ptr<map<list<string>, vector<double>>>");
         weak_ptr<map<list<string>, vector<double>>> wp, wp2;
         for (int i = 0; i < 5; ++i) {
             list<string> ls;
@@ -1556,24 +1100,12 @@ namespace Tester {
                 }
             }
             if (flag) {
-                changeColor(GREEN);
-                cout << "[pass] test weak_ptr" << endl;
-                pass++;
-                total++;
+                PASS("weak_ptr<map<list<string>, vector<double>>>");
             } else {
-                changeColor(RED);
-                cout << "[fail] test weak_ptr" << endl;
-                fail++;
-                total++;
+                FAIL("weak_ptr<map<list<string>, vector<double>>>");
             }
         }
-        catch(const std::exception& e)
-        {
-            changeColor(RED);
-            std::cerr << "[fail] " << e.what() << '\n';
-            fail++;
-            total++;
-        }
+        ERROR;
 
         if (pass == total) {
             changeColor(GREEN);
@@ -1583,6 +1115,18 @@ namespace Tester {
             changeColor(RED);
             cout << "[fail] " << fail << "/" << total << endl;
             return false;
+        }
+    }
+
+    /// @brief test binary serialization and deserialization and test xml serialization and deserialization
+    void AllTests() {
+        bool ok = TestBin() && TestXml(); // get the result of all tests
+        if (ok) {
+            changeColor(GREEN);
+            cout << "[success] all test pass" << endl;
+        } else {
+            changeColor(RED);
+            cout << "[fail] some test fail" << endl;
         }
     }
 }

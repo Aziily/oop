@@ -5,51 +5,208 @@
 
 using namespace std;
 
+// macro for define serialize
+#define BEGIN_REGISTER_STRUCT_SERIALIZE_BIN(className)              bool SerializeBin(className data, const string filename) {\
+                                                                        ofstream outputFile(filename, ios::binary);\
+                                                                        if (outputFile) {\
+                                                                            bool ok = true;
+#define REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(memberName)                    ok = bin::writeSerialize(data.memberName, outputFile);\
+                                                                            if (!ok) {\
+                                                                                return false;\
+                                                                            }
+#define END_REGISTER_STRUCT_SERIALIZE_BIN()                                 outputFile.close();\
+                                                                            return ok;\
+                                                                        } else {\
+                                                                            cerr << "无法打开文件：" << filename << endl;\
+                                                                            return false;\
+                                                                        }\
+                                                                    }
+
+// macro for define deserialize
+#define BEGIN_REGISTER_STRUCT_DESERIALIZE_BIN(className)            bool DeserializeBin(className& data, const string filename) {\
+                                                                        ifstream inputFile(filename, ios::binary);\
+                                                                        data = className();\
+                                                                        if (inputFile) {\
+                                                                            bool ok = true;
+#define REGISTER_STRUCT_MEMBER_DESERIALIZE_BIN(memberName)                  ok = bin::readSerialize(data.memberName, inputFile);\
+                                                                            if (!ok) {\
+                                                                                return false;\
+                                                                            }
+#define END_REGISTER_STRUCT_DESERIALIZE_BIN()                               return ok;\
+                                                                        } else {\
+                                                                            cerr << "无法打开文件：" << filename << endl;\
+                                                                            return false;\
+                                                                        }\
+                                                                    }
+
+/// @brief namespace for bin serialize and deserialize
 namespace bin {
+    /// @brief writeSerialize for basic type
+    /// @tparam T the type of data
+    /// @param data the data to be serialized
+    /// @param outputFile the stream to write
+    /// @return true if success, false if fail
     template <typename T>
     bool writeSerialize(const T data, ofstream& outputFile);
+    /// @brief writeSerialize for string
+    /// @param data the string to be serialized
+    /// @param outputFile the stream to write
+    /// @return true if success, false if fail
     bool writeSerialize(const string data, ofstream& outputFile);
+    /// @brief writeSerialize for list
+    /// @tparam T the type of list item
+    /// @param data the list to be serialized
+    /// @param outputFile the stream to write
+    /// @return true if success, false if fail
     template <typename T>
     bool writeSerialize(list<T> data, ofstream& outputFile);
+    /// @brief writeSerialize for set
+    /// @tparam T the type of set item
+    /// @param data the set to be serialized
+    /// @param outputFile the stream to write
+    /// @return true if success, false if fail
     template <typename T>
     bool writeSerialize(set<T> data, ofstream& outputFile);
+    /// @brief writeSerialize for vector
+    /// @tparam T the type of vector item
+    /// @param data the vector to be serialized
+    /// @param outputFile the stream to write
+    /// @return true if success, false if fail
     template <typename T>
     bool writeSerialize(vector<T> data, ofstream& outputFile);
+    /// @brief writeSerialize for map
+    /// @tparam T1 the type of map key
+    /// @tparam T2 the type of map value
+    /// @param data the map to be serialized
+    /// @param outputFile the stream to write
+    /// @return true if success, false if fail
     template <typename T1, typename T2>
     bool writeSerialize(map<T1, T2> data, ofstream& outputFile);
+    /// @brief writeSerialize for pair
+    /// @tparam T1 the type of pair first
+    /// @tparam T2 the type of pair second
+    /// @param data the pair to be serialized
+    /// @param outputFile the stream to write
+    /// @return true if success, false if fail
     template <typename T1, typename T2>
     bool writeSerialize(pair<T1, T2> data, ofstream& outputFile);
 
-
+    /// @brief readSerialize for basic type
+    /// @tparam T the type of data
+    /// @param data the data to be deserialized
+    /// @param inputFile the stream to read
+    /// @return true if success, false if fail
     template <typename T>
     bool readSerialize(T& data, ifstream& inputFile);
+    /// @brief readSerialize for string
+    /// @param data the string to be deserialized
+    /// @param inputFile the stream to read
+    /// @return true if success, false if fail
     bool readSerialize(string& data, ifstream& inputFile);
+    /// @brief readSerialize for list
+    /// @tparam T the type of list item
+    /// @param data the list to be deserialized
+    /// @param inputFile the stream to read
+    /// @return true if success, false if fail
     template <typename T>
     bool readSerialize(list<T>& data, ifstream& inputFile);
+    /// @brief readSerialize for set
+    /// @tparam T the type of set item
+    /// @param data the set to be deserialized
+    /// @param inputFile the stream to read
+    /// @return true if success, false if fail
     template <typename T>
     bool readSerialize(set<T>& data, ifstream& inputFile);
+    /// @brief readSerialize for vector
+    /// @tparam T the type of vector item
+    /// @param data the vector to be deserialized
+    /// @param inputFile the stream to read
+    /// @return true if success, false if fail
     template <typename T>
     bool readSerialize(vector<T>& data, ifstream& inputFile);
+    /// @brief readSerialize for map
+    /// @tparam T1 the type of map key
+    /// @tparam T2 the type of map value
+    /// @param data the map to be deserialized
+    /// @param inputFile the stream to read
+    /// @return true if success, false if fail
     template <typename T1, typename T2>
     bool readSerialize(map<T1, T2>& data, ifstream& inputFile);
+    /// @brief readSerialize for pair
+    /// @tparam T1 the type of pair first
+    /// @tparam T2 the type of pair second
+    /// @param data the pair to be deserialized
+    /// @param inputFile the stream to read
+    /// @return true if success, false if fail
     template <typename T1, typename T2>
     bool readSerialize(pair<T1, T2>& data, ifstream& inputFile);
 
-
+    /// @brief Serialize
+    /// @tparam T the type of data
+    /// @param data the data to be serialized
+    /// @param filename the file to write
+    /// @return true if success, false if fail
     template <typename T>
     bool Serialize(const T data, const string filename);
+    /// @brief Serialize
+    /// @tparam T the type of data
+    /// @param data unique_ptr of type T to be serialized
+    /// @param filename the file to write
+    /// @return true if success, false if fail
+    template <typename T>
+    bool Serialize(const unique_ptr<T>& data, const string filename);
+    /// @brief Serialize
+    /// @tparam T the type of data
+    /// @param data shared_ptr of type T to be serialized
+    /// @param filename the file to write
+    /// @return true if success, false if fail
+    template <typename T>
+    bool Serialize(const shared_ptr<T>& data, const string filename);
+    /// @brief Serialize
+    /// @tparam T the type of data
+    /// @param data weak_ptr of type T to be serialized
+    /// @param filename the file to write
+    /// @return true if success, false if fail
+    template <typename T>
+    bool Serialize(const weak_ptr<T>& data, const string filename);
+    /// @brief Deserialize
+    /// @tparam T the type of data
+    /// @param data the data to be deserialized
+    /// @param filename the file to read
+    /// @return true if success, false if fail
     template <typename T>
     bool Deserialize(T& data, const string filename);
+    /// @brief Deserialize
+    /// @tparam T the type of data
+    /// @param data unique_ptr of type T to be deserialized
+    /// @param filename the file to read
+    /// @return true if success, false if fail
+    template <typename T>
+    bool Deserialize(unique_ptr<T>& data, const string filename);
+    /// @brief Deserialize
+    /// @tparam T the type of data
+    /// @param data shared_ptr of type T to be deserialized
+    /// @param filename the file to read
+    /// @return true if success, false if fail
+    template <typename T>
+    bool Deserialize(shared_ptr<T>& data, const string filename);
+    /// @brief Deserialize
+    /// @tparam T the type of data
+    /// @param data weak_ptr of type T to be deserialized
+    /// @param filename the file to read
+    /// @return true if success, false if fail
+    template <typename T>
+    bool Deserialize(weak_ptr<T>& data, const string filename);
 
     template <typename T>
     bool writeSerialize(const T data, ofstream& outputFile) {
         // cout << "data size: " << utils::size::getSize(data) << endl;
         if (outputFile) {
-            int size = utils::size::getSize(data);
+            int size = utils::size::getSize(data); // get size of data
             outputFile.write(reinterpret_cast<const char*>(&data), size);
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -57,13 +214,14 @@ namespace bin {
         // cout << "string size: " << utils::size::getSize(data) << endl;
         if (outputFile) {
             int size = utils::size::getSize(data);
-            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+            outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size)); // write size of string
+            // serialize each char
             for (int i = 0; i < size; ++i) {
                 outputFile.write(reinterpret_cast<const char*>(&data[i]), sizeof(data[i]));
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -78,7 +236,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -93,7 +251,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -108,7 +266,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -124,7 +282,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -136,7 +294,7 @@ namespace bin {
             writeSerialize(data.second, outputFile);
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -150,7 +308,7 @@ namespace bin {
             inputFile.read(reinterpret_cast<char*>(&data), size);
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -166,7 +324,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -183,7 +341,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -200,7 +358,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -217,7 +375,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -236,7 +394,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -256,7 +414,7 @@ namespace bin {
             }
             return true;
         } else {
-            cerr << "无法打开文件" << endl;
+            cerr << "Cannot open the file!" << endl;
             return false;
         }
     }
@@ -265,11 +423,11 @@ namespace bin {
     bool Serialize(const T data, const string filename) {
         ofstream outputFile(filename, ios::binary);
         if (outputFile) {
-            bool ok = writeSerialize(data, outputFile);
+            bool ok = writeSerialize(data, outputFile); // recursive call
             outputFile.close();
             return ok;
         } else {
-            cerr << "无法打开文件：" << filename << endl;
+            cerr << "Cannot open file: " << filename << endl;
             return false;
         }
     }
@@ -298,7 +456,7 @@ namespace bin {
             inputFile.close();
             return ok;
         } else {
-            cerr << "无法打开文件：" << filename << endl;
+            cerr << "Cannot open file: " << filename << endl;
             return false;
         }
     }
@@ -321,37 +479,5 @@ namespace bin {
         return ok;
     }
 };
-
-#define BEGIN_REGISTER_STRUCT_SERIALIZE_BIN(className)              bool SerializeBin(className data, const string filename) {\
-                                                                        ofstream outputFile(filename, ios::binary);\
-                                                                        if (outputFile) {\
-                                                                            bool ok = true;
-#define REGISTER_STRUCT_MEMBER_SERIALIZE_BIN(memberName)                    ok = bin::writeSerialize(data.memberName, outputFile);\
-                                                                            if (!ok) {\
-                                                                                return false;\
-                                                                            }
-#define END_REGISTER_STRUCT_SERIALIZE_BIN()                                 outputFile.close();\
-                                                                            return ok;\
-                                                                        } else {\
-                                                                            cerr << "无法打开文件：" << filename << endl;\
-                                                                            return false;\
-                                                                        }\
-                                                                    }
-
-#define BEGIN_REGISTER_STRUCT_DESERIALIZE_BIN(className)            bool DeserializeBin(className& data, const string filename) {\
-                                                                        ifstream inputFile(filename, ios::binary);\
-                                                                        data = className();\
-                                                                        if (inputFile) {\
-                                                                            bool ok = true;
-#define REGISTER_STRUCT_MEMBER_DESERIALIZE_BIN(memberName)                  ok = bin::readSerialize(data.memberName, inputFile);\
-                                                                            if (!ok) {\
-                                                                                return false;\
-                                                                            }
-#define END_REGISTER_STRUCT_DESERIALIZE_BIN()                               return ok;\
-                                                                        } else {\
-                                                                            cerr << "无法打开文件：" << filename << endl;\
-                                                                            return false;\
-                                                                        }\
-                                                                    }
 
 #endif
