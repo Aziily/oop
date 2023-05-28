@@ -60,7 +60,7 @@ END_REGISTER_STRUCT_DESERIALIZE_XML()
 
 /// @brief the namespace contains some test functions
 namespace tester {
-    static const string PRE = "../output/";     // the prefix of output file
+    static const string DATA_PATH = "../output/";     // the prefix of output file
 
     static const string WHITE = "\033[0m";      // white color
     static const string RED = "\033[31m";       // red color
@@ -85,8 +85,8 @@ namespace tester {
         bool b = true, b2;
         try
         {
-            bin::Serialize(b, PRE + "b.bin");
-            bin::Deserialize(b2, PRE + "b.bin");
+            bin::Serialize(b, DATA_PATH + "b.bin");
+            bin::Deserialize(b2, DATA_PATH + "b.bin");
             if (b == b2) {
                 PASS("bool");
             } else {
@@ -100,8 +100,8 @@ namespace tester {
         char c = 'a', c2;
         try
         {
-            bin::Serialize(c, PRE + "c.bin");
-            bin::Deserialize(c2, PRE + "c.bin");
+            bin::Serialize(c, DATA_PATH + "c.bin");
+            bin::Deserialize(c2, DATA_PATH + "c.bin");
             if (c == c2) {
                 PASS("char");
             } else {
@@ -115,8 +115,8 @@ namespace tester {
         int num = 123456789, num2;
         try
         {
-            bin::Serialize(num, PRE + "num.bin");
-            bin::Deserialize(num2, PRE + "num.bin");
+            bin::Serialize(num, DATA_PATH + "num.bin");
+            bin::Deserialize(num2, DATA_PATH + "num.bin");
             if (num == num2) {
                 PASS("int");
             } else {
@@ -130,8 +130,8 @@ namespace tester {
         float f = 188.888888, f2;
         try
         {
-            bin::Serialize(f, PRE + "f.bin");
-            bin::Deserialize(f2, PRE + "f.bin");
+            bin::Serialize(f, DATA_PATH + "f.bin");
+            bin::Deserialize(f2, DATA_PATH + "f.bin");
             if (f == f2) {
                 PASS("float");
             } else {
@@ -146,8 +146,8 @@ namespace tester {
         double d = 123456789.123456789, d2;
         try
         {
-            bin::Serialize(d, PRE + "d.bin");
-            bin::Deserialize(d2, PRE + "d.bin");
+            bin::Serialize(d, DATA_PATH + "d.bin");
+            bin::Deserialize(d2, DATA_PATH + "d.bin");
             if (d == d2) {
                 PASS("double");
             } else {
@@ -162,8 +162,8 @@ namespace tester {
         string str = "Hello World!", str2;
         try
         {
-            bin::Serialize(str, PRE + "str.bin");
-            bin::Deserialize(str2, PRE + "str.bin");
+            bin::Serialize(str, DATA_PATH + "str.bin");
+            bin::Deserialize(str2, DATA_PATH + "str.bin");
             if (str == str2) {
                 PASS("string");
             } else {
@@ -177,8 +177,8 @@ namespace tester {
         list<int> l = {1, 2, 3, 4, 5}, l2;
         try
         {
-            bin::Serialize(l, PRE + "l.bin");
-            bin::Deserialize(l2, PRE + "l.bin");
+            bin::Serialize(l, DATA_PATH + "l.bin");
+            bin::Deserialize(l2, DATA_PATH + "l.bin");
             bool flag = true;
             for (auto it1 = l.begin(), it2 = l2.begin(); it1 != l.end() && it2 != l2.end(); ++it1, ++it2) {
                 if (*it1 != *it2) {
@@ -199,8 +199,8 @@ namespace tester {
         set<int> s = {1, 2, 3, 4, 5}, s2;
         try
         {
-            bin::Serialize(s, PRE + "s.bin");
-            bin::Deserialize(s2, PRE + "s.bin");
+            bin::Serialize(s, DATA_PATH + "s.bin");
+            bin::Deserialize(s2, DATA_PATH + "s.bin");
             bool flag = true;
             for (auto it1 = s.begin(), it2 = s2.begin(); it1 != s.end() && it2 != s2.end(); ++it1, ++it2) {
                 if (*it1 != *it2) {
@@ -221,8 +221,8 @@ namespace tester {
         vector<int> v = {1, 2, 3, 4, 5}, v2;
         try
         {
-            bin::Serialize(v, PRE + "v.bin");
-            bin::Deserialize(v2, PRE + "v.bin");
+            bin::Serialize(v, DATA_PATH + "v.bin");
+            bin::Deserialize(v2, DATA_PATH + "v.bin");
             bool flag = true;
             for (auto it1 = v.begin(), it2 = v2.begin(); it1 != v.end() && it2 != v2.end(); ++it1, ++it2) {
                 if (*it1 != *it2) {
@@ -243,8 +243,8 @@ namespace tester {
         map<int, int> m = {{1, 1}, {2, 2}, {3, 3}, {4, 4}, {5, 5}}, m2;
         try
         {
-            bin::Serialize(m, PRE + "m.bin");
-            bin::Deserialize(m2, PRE + "m.bin");
+            bin::Serialize(m, DATA_PATH + "m.bin");
+            bin::Deserialize(m2, DATA_PATH + "m.bin");
             bool flag = true;
             for (auto it1 = m.begin(), it2 = m2.begin(); it1 != m.end() && it2 != m2.end(); ++it1, ++it2) {
                 if (it1->first != it2->first || it1->second != it2->second) {
@@ -265,8 +265,8 @@ namespace tester {
         pair<int, int> p = {1, 1}, p2;
         try
         {
-            bin::Serialize(p, PRE + "p.bin");
-            bin::Deserialize(p2, PRE + "p.bin");
+            bin::Serialize(p, DATA_PATH + "p.bin");
+            bin::Deserialize(p2, DATA_PATH + "p.bin");
             if (p.first == p2.first && p.second == p2.second) {
                 PASS("pair");
             } else {
@@ -286,8 +286,8 @@ namespace tester {
         }, ml2;
         try
         {
-            bin::Serialize(ml, PRE + "ml.bin");
-            bin::Deserialize(ml2, PRE + "ml.bin");
+            bin::Serialize(ml, DATA_PATH + "ml.bin");
+            bin::Deserialize(ml2, DATA_PATH + "ml.bin");
             bool flag = true;
             for (auto it1 = ml.begin(), it2 = ml2.begin(); it1 != ml.end() && it2 != ml2.end(); ++it1, ++it2) {
                 if (it1->first != it2->first) {
@@ -320,8 +320,8 @@ namespace tester {
         }, vl2;
         try
         {
-            bin::Serialize(vl, PRE + "vl.bin");
-            bin::Deserialize(vl2, PRE + "vl.bin");
+            bin::Serialize(vl, DATA_PATH + "vl.bin");
+            bin::Deserialize(vl2, DATA_PATH + "vl.bin");
             bool flag = true;
             for (auto it1 = vl.begin(), it2 = vl2.begin(); it1 != vl.end() && it2 != vl2.end(); ++it1, ++it2) {
                 for (auto it3 = it1->begin(), it4 = it2->begin(); it3 != it1->end() && it4 != it2->end(); ++it3, ++it4) {
@@ -350,8 +350,8 @@ namespace tester {
         }, sl2;
         try
         {
-            bin::Serialize(sl, PRE + "sl.bin");
-            bin::Deserialize(sl2, PRE + "sl.bin");
+            bin::Serialize(sl, DATA_PATH + "sl.bin");
+            bin::Deserialize(sl2, DATA_PATH + "sl.bin");
             bool flag = true;
             for (auto it1 = sl.begin(), it2 = sl2.begin(); it1 != sl.end() && it2 != sl2.end(); ++it1, ++it2) {
                 for (auto it3 = it1->begin(), it4 = it2->begin(); it3 != it1->end() && it4 != it2->end(); ++it3, ++it4) {
@@ -389,8 +389,8 @@ namespace tester {
         }
         try
         {
-            bin::Serialize(mvl, PRE + "mvl.bin");
-            bin::Deserialize(mvl2, PRE + "mvl.bin");
+            bin::Serialize(mvl, DATA_PATH + "mvl.bin");
+            bin::Deserialize(mvl2, DATA_PATH + "mvl.bin");
             bool flag = true;
             for (auto it1 = mvl.begin(), it2 = mvl2.begin(); it1 != mvl.end() && it2 != mvl2.end(); ++it1, ++it2) {
                 if (it1->first != it2->first) {
@@ -440,8 +440,8 @@ namespace tester {
         }
         try
         {
-            bin::Serialize(mlvl, PRE + "mlvl.bin");
-            bin::Deserialize(mlvl2, PRE + "mlvl.bin");
+            bin::Serialize(mlvl, DATA_PATH + "mlvl.bin");
+            bin::Deserialize(mlvl2, DATA_PATH + "mlvl.bin");
             bool flag = true;
             for (auto it1 = mlvl.begin(), it2 = mlvl2.begin(); it1 != mlvl.end() && it2 != mlvl2.end(); ++it1, ++it2) {
                 if (it1->first != it2->first) {
@@ -480,8 +480,8 @@ namespace tester {
         t.data.push_back(2);
         t.data.push_back(3);
         try {
-            SerializeBin(t, PRE + "t.bin");
-            DeserializeBin(t2, PRE + "t.bin");
+            SerializeBin(t, DATA_PATH + "t.bin");
+            DeserializeBin(t2, DATA_PATH + "t.bin");
             bool flag = true;
             for (auto it1 = t.data.begin(), it2 = t2.data.begin(); it1 != t.data.end() && it2 != t2.data.end(); ++it1, ++it2) {
                 if (*it1 != *it2) {
@@ -513,8 +513,8 @@ namespace tester {
             up->insert({ls, vd});
         }
         try {
-            bin::Serialize(up, PRE + "up.bin");
-            bin::Deserialize(up2, PRE + "up.bin");
+            bin::Serialize(up, DATA_PATH + "up.bin");
+            bin::Deserialize(up2, DATA_PATH + "up.bin");
             bool flag = true;
             for (auto it1 = up->begin(), it2 = up2->begin(); it1 != up->end() && it2 != up2->end(); ++it1, ++it2) {
                 for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
@@ -554,8 +554,8 @@ namespace tester {
             sp->insert({ls, vd});
         }
         try {
-            bin::Serialize(sp, PRE + "sp.bin");
-            bin::Deserialize(sp2, PRE + "sp.bin");
+            bin::Serialize(sp, DATA_PATH + "sp.bin");
+            bin::Deserialize(sp2, DATA_PATH + "sp.bin");
             bool flag = true;
             for (auto it1 = sp->begin(), it2 = sp2->begin(); it1 != sp->end() && it2 != sp2->end(); ++it1, ++it2) {
                 for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
@@ -596,8 +596,8 @@ namespace tester {
         wp = sp;
         wp2 = sp2;
         try {
-            bin::Serialize(wp, PRE + "wp.bin");
-            bin::Deserialize(wp2, PRE + "wp.bin");
+            bin::Serialize(wp, DATA_PATH + "wp.bin");
+            bin::Deserialize(wp2, DATA_PATH + "wp.bin");
             bool flag = true;
             for (auto it1 = sp->begin(), it2 = wp2.lock()->begin(); it1 != sp->end() && it2 != wp2.lock()->end(); ++it1, ++it2) {
                 for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
@@ -625,10 +625,12 @@ namespace tester {
         if (pass == total) {
             changeColor(GREEN);
             cout << "[success] " << pass << "/" << total << endl;
+            changeColor(WHITE);
             return true;
         } else {
             changeColor(RED);
             cout << "[fail] " << fail << "/" << total << endl;
+            changeColor(WHITE);
             return false;
         }
     }
@@ -643,8 +645,8 @@ namespace tester {
         bool b = true, b2;
         try
         {
-            xml::Serialize(b, PRE + "b.xml");
-            xml::Deserialize(b2, PRE + "b.xml");
+            xml::Serialize(b, DATA_PATH + "b.xml");
+            xml::Deserialize(b2, DATA_PATH + "b.xml");
             if (b == b2) {
                 PASS("bool");
             } else {
@@ -658,8 +660,8 @@ namespace tester {
         char c = 'a', c2;
         try
         {
-            xml::Serialize(c, PRE + "c.xml");
-            xml::Deserialize(c2, PRE + "c.xml");
+            xml::Serialize(c, DATA_PATH + "c.xml");
+            xml::Deserialize(c2, DATA_PATH + "c.xml");
             if (c == c2) {
                 PASS("char");
             } else {
@@ -673,8 +675,8 @@ namespace tester {
         int i = 123456789, i2;
         try
         {
-            xml::Serialize(i, PRE + "i.xml");
-            xml::Deserialize(i2, PRE + "i.xml");
+            xml::Serialize(i, DATA_PATH + "i.xml");
+            xml::Deserialize(i2, DATA_PATH + "i.xml");
             if (i == i2) {
                 PASS("int");
             } else {
@@ -688,8 +690,8 @@ namespace tester {
         float f = 123.456f, f2;
         try
         {
-            xml::Serialize(f, PRE + "f.xml");
-            xml::Deserialize(f2, PRE + "f.xml");
+            xml::Serialize(f, DATA_PATH + "f.xml");
+            xml::Deserialize(f2, DATA_PATH + "f.xml");
             if (f == f2) {
                 PASS("float");
             } else {
@@ -703,8 +705,8 @@ namespace tester {
         double d = 123.456789128192112, d2;
         try
         {
-            xml::Serialize(d, PRE + "d.xml");
-            xml::Deserialize(d2, PRE + "d.xml");
+            xml::Serialize(d, DATA_PATH + "d.xml");
+            xml::Deserialize(d2, DATA_PATH + "d.xml");
             if (d == d2) {
                 PASS("double");
             } else {
@@ -718,8 +720,8 @@ namespace tester {
         string s = "hello world", s2;
         try
         {
-            xml::Serialize(s, PRE + "s.xml");
-            xml::Deserialize(s2, PRE + "s.xml");
+            xml::Serialize(s, DATA_PATH + "s.xml");
+            xml::Deserialize(s2, DATA_PATH + "s.xml");
             if (s == s2) {
                 PASS("string");
             } else {
@@ -733,8 +735,8 @@ namespace tester {
         vector<int> v = {1, 2, 3, 4, 5}, v2;
         try
         {
-            xml::Serialize(v, PRE + "v.xml");
-            xml::Deserialize(v2, PRE + "v.xml");
+            xml::Serialize(v, DATA_PATH + "v.xml");
+            xml::Deserialize(v2, DATA_PATH + "v.xml");
             bool flag = true;
             for (int i = 0; i < v.size(); i++) {
                 if (v[i] != v2[i]) {
@@ -755,8 +757,8 @@ namespace tester {
         list<int> l = {1, 2, 3, 4, 5}, l2;
         try
         {
-            xml::Serialize(l, PRE + "l.xml");
-            xml::Deserialize(l2, PRE + "l.xml");
+            xml::Serialize(l, DATA_PATH + "l.xml");
+            xml::Deserialize(l2, DATA_PATH + "l.xml");
             bool flag = true;
             auto it1 = l.begin();
             auto it2 = l2.begin();
@@ -779,8 +781,8 @@ namespace tester {
         set<int> se = {1, 2, 3, 4, 5}, se2;
         try
         {
-            xml::Serialize(se, PRE + "se.xml");
-            xml::Deserialize(se2, PRE + "se.xml");
+            xml::Serialize(se, DATA_PATH + "se.xml");
+            xml::Deserialize(se2, DATA_PATH + "se.xml");
             bool flag = true;
             auto it1 = se.begin();
             auto it2 = se2.begin();
@@ -803,8 +805,8 @@ namespace tester {
         map<int, string> m = {{1, "a"}, {2, "b"}, {3, "c"}}, m2;
         try
         {
-            xml::Serialize(m, PRE + "m.xml");
-            xml::Deserialize(m2, PRE + "m.xml");
+            xml::Serialize(m, DATA_PATH + "m.xml");
+            xml::Deserialize(m2, DATA_PATH + "m.xml");
             bool flag = true;
             auto it1 = m.begin();
             auto it2 = m2.begin();
@@ -827,8 +829,8 @@ namespace tester {
         pair<int, string> p = {1, "a"}, p2;
         try
         {
-            xml::Serialize(p, PRE + "p.xml");
-            xml::Deserialize(p2, PRE + "p.xml");
+            xml::Serialize(p, DATA_PATH + "p.xml");
+            xml::Deserialize(p2, DATA_PATH + "p.xml");
             if (p.first == p2.first && p.second == p2.second) {
                 PASS("pair");
             } else {
@@ -842,8 +844,8 @@ namespace tester {
         vector<list<set<int>>> vls = {{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}}, vls2;
         try
         {
-            xml::Serialize(vls, PRE + "vls.xml");
-            xml::Deserialize(vls2, PRE + "vls.xml");
+            xml::Serialize(vls, DATA_PATH + "vls.xml");
+            xml::Deserialize(vls2, DATA_PATH + "vls.xml");
             bool flag = true;
             for (auto it1 = vls.begin(), it2 = vls2.begin(); it1 != vls.end(); it1++, it2++) {
                 auto it3 = it1->begin();
@@ -874,8 +876,8 @@ namespace tester {
         map<int, vector<list<set<int>>>> mvls = {{1, {{{1, 2, 3}, {4, 5, 6}}, {{7, 8, 9}, {10, 11, 12}}}}}, mvls2;
         try
         {
-            xml::Serialize(mvls, PRE + "mvls.xml");
-            xml::Deserialize(mvls2, PRE + "mvls.xml");
+            xml::Serialize(mvls, DATA_PATH + "mvls.xml");
+            xml::Deserialize(mvls2, DATA_PATH + "mvls.xml");
             bool flag = true;
             for (auto it1 = mvls.begin(), it2 = mvls2.begin(); it1 != mvls.end(); it1++, it2++) {
                 auto it3 = it1->second.begin();
@@ -926,8 +928,8 @@ namespace tester {
         }
         try
         {
-            xml::Serialize(mlvl, PRE + "mlvl.xml");
-            xml::Deserialize(mlvl2, PRE + "mlvl.xml");
+            xml::Serialize(mlvl, DATA_PATH + "mlvl.xml");
+            xml::Deserialize(mlvl2, DATA_PATH + "mlvl.xml");
             bool flag = true;
             for (auto it1 = mlvl.begin(), it2 = mlvl2.begin(); it1 != mlvl.end() && it2 != mlvl2.end(); ++it1, ++it2) {
                 if (it1->first != it2->first) {
@@ -966,8 +968,8 @@ namespace tester {
         t.data.push_back(2);
         t.data.push_back(3);
         try {
-            SerializeXml(t, PRE + "t.xml");
-            DeserializeXml(t2, PRE + "t.xml");
+            SerializeXml(t, DATA_PATH + "t.xml");
+            DeserializeXml(t2, DATA_PATH + "t.xml");
             bool flag = true;
             for (auto it1 = t.data.begin(), it2 = t2.data.begin(); it1 != t.data.end() && it2 != t2.data.end(); ++it1, ++it2) {
                 if (*it1 != *it2) {
@@ -999,8 +1001,8 @@ namespace tester {
             up->insert({ls, vd});
         }
         try {
-            xml::Serialize(up, PRE + "up.xml");
-            xml::Deserialize(up2, PRE + "up.xml");
+            xml::Serialize(up, DATA_PATH + "up.xml");
+            xml::Deserialize(up2, DATA_PATH + "up.xml");
             bool flag = true;
             for (auto it1 = up->begin(), it2 = up2->begin(); it1 != up->end() && it2 != up2->end(); ++it1, ++it2) {
                 for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
@@ -1040,8 +1042,8 @@ namespace tester {
             sp->insert({ls, vd});
         }
         try {
-            xml::Serialize(sp, PRE + "sp.xml");
-            xml::Deserialize(sp2, PRE + "sp.xml");
+            xml::Serialize(sp, DATA_PATH + "sp.xml");
+            xml::Deserialize(sp2, DATA_PATH + "sp.xml");
             bool flag = true;
             for (auto it1 = sp->begin(), it2 = sp2->begin(); it1 != sp->end() && it2 != sp2->end(); ++it1, ++it2) {
                 for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
@@ -1082,8 +1084,8 @@ namespace tester {
         wp = sp;
         wp2 = sp2;
         try {
-            xml::Serialize(wp, PRE + "wp.xml");
-            xml::Deserialize(wp2, PRE + "wp.xml");
+            xml::Serialize(wp, DATA_PATH + "wp.xml");
+            xml::Deserialize(wp2, DATA_PATH + "wp.xml");
             bool flag = true;
             for (auto it1 = sp->begin(), it2 = wp2.lock()->begin(); it1 != sp->end() && it2 != wp2.lock()->end(); ++it1, ++it2) {
                 for (auto it3 = it1->first.begin(), it4 = it2->first.begin(); it3 != it1->first.end() && it4 != it2->first.end(); ++it3, ++it4) {
@@ -1110,10 +1112,12 @@ namespace tester {
         if (pass == total) {
             changeColor(GREEN);
             cout << "[success] " << pass << "/" << total << endl;
+            changeColor(WHITE);
             return true;
         } else {
             changeColor(RED);
             cout << "[fail] " << fail << "/" << total << endl;
+            changeColor(WHITE);
             return false;
         }
     }
@@ -1129,4 +1133,9 @@ namespace tester {
             cout << "[fail] some test fail" << endl;
         }
     }
+}
+
+int main() {
+    tester::AllTests();
+    return 0;
 }

@@ -9,12 +9,12 @@ cp src/*.hpp temp
 
 # compile
 cd temp
-g++ -std=c++2a -o ../bin/program main.cpp
+g++ -std=c++2a -o ../bin/test test.cpp
 cd ..
 
 # run
 cd bin
-./program
+./test
 cd ..
 
 # clear

@@ -1,0 +1,29 @@
+Serialize bool bin: 3.41441
+Deserialize bool bin: 2.544
+Serialize char bin: 3.40707
+Deserialize char bin: 2.45605
+Serialize int bin: 0.814898
+Deserialize int bin: 0.670437
+Serialize float bin: 0.8506
+Deserialize float bin: 0.647498
+Serialize double bin: 0.402135
+Deserialize double bin: 0.319375
+Serialize std_string bin: 0.438504
+Deserialize std_string bin: 0.33229
+Serialize std_vector bin: 0.424125
+Deserialize std_vector bin: 0.337325
+Serialize std_list bin: 0.400734
+Deserialize std_list bin: 0.325852
+Serialize std_set bin: 0.410503
+Deserialize std_set bin: 0.313891
+Serialize std_map bin: 0.396664
+Deserialize std_map bin: 0.314946
+Serialize std_pair bin: 0.418864
+Deserialize std_pair bin: 0.332049
+===
+Serialize string length bin: 0.422818|0.330868 0.435403|0.351109 0.521196|0.635412
+Serialize vector double bin: 0.411173|0.322043 0.409191|0.337743 0.420469|0.365302
+Serialize list double bin: 0.407056|0.34334 0.460871|0.344248 0.620087|0.494371
+Serialize set double bin: 0.438475|0.341644 0.437565|0.341248 0.621998|0.655226
+Serialize map float float bin: 0.442978|0.331886 0.460101|0.367643 0.614059|0.701682
+===

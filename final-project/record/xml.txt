@@ -1,0 +1,29 @@
+Serialize bool xml: 3.47794
+Deserialize bool xml: 2.97033
+Serialize char xml: 3.33256
+Deserialize char xml: 2.75206
+Serialize int xml: 0.89735
+Deserialize int xml: 0.727065
+Serialize float xml: 0.938294
+Deserialize float xml: 0.690019
+Serialize double xml: 0.41943
+Deserialize double xml: 0.352834
+Serialize std_string xml: 0.439837
+Deserialize std_string xml: 0.355549
+Serialize std_vector xml: 0.439759
+Deserialize std_vector xml: 0.339589
+Serialize std_list xml: 0.435005
+Deserialize std_list xml: 0.359366
+Serialize std_set xml: 0.426673
+Deserialize std_set xml: 0.349702
+Serialize std_map xml: 0.441156
+Deserialize std_map xml: 0.364374
+Serialize std_pair xml: 0.45076
+Deserialize std_pair xml: 0.363263
+===
+Serialize string length xml: 0.43455|0.354964 0.420577|0.380249 0.60486|0.665544
+Serialize vector double xml: 0.456565|0.397091 0.592763|0.651433 2.19147|3.21424
+Serialize list double xml: 0.549851|0.419875 0.676856|0.738726 2.70707|3.91243
+Serialize set double xml: 0.462036|0.395389 0.668828|0.704681 2.94333|4.04466
+Serialize map float float xml: 0.497079|0.480379 1.15861|1.57164 7.58851|12.5381
+===
